@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colaboradores - Saúde Ocupacional</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        body { opacity: 0; animation: pageFade 0.3s ease-out forwards; }
+        @keyframes pageFade { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-slate-100">
+    <div class="app-layout">
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden" onclick="toggleSidebar()"></div>
+        
+        <aside id="sidebar" class="sidebar sidebar-transition fixed lg:relative z-50">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <div class="whitespace-nowrap">
+                        <div class="sidebar-brand-text">Saúde</div>
+                        <div class="sidebar-brand-subtitle">Ocupacional</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-section">
+                    <a href="/dashboard" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                        <span class="whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="/colaboradores" class="sidebar-nav-link active">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        <span class="whitespace-nowrap">Colaboradores</span>
+                    </a>
+                    <a href="/atendimento" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <span class="whitespace-nowrap">Atendimentos</span>
+                    </a>
+                    <a href="/acidentes" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span class="whitespace-nowrap">Acidentes</span>
+                    </a>
+                    <a href="/agendamentos" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="whitespace-nowrap">Agendamentos</span>
+                    </a>
+                    <a href="/estoque" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        <span class="whitespace-nowrap">Estoque</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-footer-text"></div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="app-header">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden header-icon-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+                    <button onclick="toggleCollapse()" class="hidden lg:block header-icon-btn" title="Colapsar menu"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+                    <div>
+                        <h1 class="text-lg font-semibold text-slate-800">Colaboradores</h1>
+                        <p class="text-sm text-slate-500">Gerenciamento de colaboradores</p>
+                    </div>
+                </div>
+                <div class="app-header-right">
+                    <button onclick="logout()" class="header-icon-btn" title="Sair">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Lista de Colaboradores</h2>
+                        <button onclick="showModal('modal-colaborador')" class="btn btn-success btn-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Novo
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-bar">
+                            <input type="text" id="search" class="search-input" placeholder="Buscar por nome ou matrícula...">
+                            <button onclick="loadColaboradores()" class="btn btn-secondary">Buscar</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Matrícula</th>
+                                        <th>Nome</th>
+                                        <th>Setor</th>
+                                        <th>Cargo</th>
+                                        <th>Risco</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-colaboradores">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal -->
+    <div id="modal-colaborador" class="modal-overlay">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Novo Colaborador</h2>
+                <button onclick="hideModal('modal-colaborador')" class="modal-close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-colaborador" class="space-y-4">
+                    <input type="hidden" id="colab-id">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Nome Completo</label>
+                            <input type="text" id="colab-nome" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Matrícula</label>
+                            <input type="text" id="colab-matricula" required class="form-input">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Setor</label>
+                            <select id="colab-setor" required class="form-input">
+                                <option value="PRODUCAO">Produção</option>
+                                <option value="MANUTENCAO">Manutenção</option>
+                                <option value="LOGISTICA">Logística</option>
+                                <option value="ADMINISTRATIVO">Administrativo</option>
+                                <option value="QUALIDADE">Qualidade</option>
+                                <option value="EXPEDICAO">Expedição</option>
+                                <option value="ALMOXARIFADO">Almoxarifado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cargo</label>
+                            <input type="text" id="colab-cargo" required class="form-input">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Risco</label>
+                            <select id="colab-risco" required class="form-input">
+                                <option value="BAIXO">Baixo</option>
+                                <option value="MEDIO">Médio</option>
+                                <option value="ALTO">Alto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Admissão</label>
+                            <input type="date" id="colab-admissao" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">EPIs Obrigatórios</label>
+                        <input type="text" id="colab-epis" class="form-input" placeholder="Ex: Luvas, Óculos, Protetor auricular">
+                    </div>
+                    <div class="border-t border-slate-200 pt-4 mt-4">
+                        <h3 class="font-semibold text-slate-800 mb-4">Contato de Emergência</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Nome Contato</label>
+                                <input type="text" id="colab-contato-nome" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telefone</label>
+                                <input type="text" id="colab-contato-tel" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="btn btn-primary btn-block">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/app.js}"></script>
+    <script>
+        let collapsed = false;
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+        
+        function toggleCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            collapsed = !collapsed;
+            if (collapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.style.marginLeft = '80px';
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.style.marginLeft = '280px';
+            }
+        }
+        
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        async function loadColaboradores() {
+            const data = await Colaboradores.getAll();
+            const tbody = document.getElementById('tabela-colaboradores');
+            tbody.innerHTML = '';
+            data.forEach(c => {
+                const riscoClass = c.tipoRisco === 'ALTO' ? 'badge-danger' : c.tipoRisco === 'MEDIO' ? 'badge-warning' : 'badge-success';
+                const statusClass = c.statusFuncionario === 'ATIVO' ? 'badge-success' : 'badge-danger';
+                const status = c.statusFuncionario || 'ATIVO';
+                tbody.innerHTML += `<tr>
+                    <td class="font-medium text-slate-700">${c.matricula}</td>
+                    <td class="font-medium text-slate-800">${c.nomeCompleto}</td>
+                    <td class="text-slate-600">${c.setor}</td>
+                    <td class="text-slate-600">${c.cargo}</td>
+                    <td><span class="badge ${riscoClass}">${c.tipoRisco}</span></td>
+                    <td><span class="badge ${statusClass}">${status}</span></td>
+                    <td><button onclick="editarColaborador(${c.id})" class="btn btn-outline btn-sm">Editar</button></td>
+                </tr>`;
+            });
+        }
+        
+        function editarColaborador(id) {
+            Colaboradores.getById(id).then(c => {
+                document.getElementById('colab-id').value = c.id;
+                document.getElementById('colab-nome').value = c.nomeCompleto;
+                document.getElementById('colab-matricula').value = c.matricula;
+                document.getElementById('colab-setor').value = c.setor;
+                document.getElementById('colab-cargo').value = c.cargo;
+                document.getElementById('colab-risco').value = c.tipoRisco;
+                document.getElementById('colab-epis').value = c.episObrigatorios || '';
+                document.getElementById('colab-contato-nome').value = c.nomeContatoEmergencia || '';
+                document.getElementById('colab-contato-tel').value = c.telefoneContato || '';
+                document.getElementById('modal-title').textContent = 'Editar Colaborador';
+                showModal('modal-colaborador');
+            });
+        }
+        
+        document.getElementById('form-colaborador').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const id = document.getElementById('colab-id').value;
+                const data = {
+                    id: id || null,
+                    nomeCompleto: document.getElementById('colab-nome').value,
+                    matricula: document.getElementById('colab-matricula').value,
+                    setor: document.getElementById('colab-setor').value,
+                    cargo: document.getElementById('colab-cargo').value,
+                    tipoRisco: document.getElementById('colab-risco').value,
+                    episObrigatorios: document.getElementById('colab-epis').value,
+                    nomeContatoEmergencia: document.getElementById('colab-contato-nome').value,
+                    telefoneContato: document.getElementById('colab-contato-tel').value,
+                    dataAdmissao: document.getElementById('colab-admissao').value
+                };
+                if (id) { await Colaboradores.update(parseInt(id), data); }
+                else { await Colaboradores.save(data); }
+                hideModal('modal-colaborador');
+                document.getElementById('form-colaborador').reset();
+                document.getElementById('colab-id').value = '';
+                loadColaboradores();
+            } catch (err) {
+                console.error('Erro ao salvar:', err);
+            }
+        });
+        
+        function logout() { localStorage.removeItem('token'); window.location.replace('/login'); }
+        if (localStorage.getItem('token')) {
+            loadColaboradores();
+        } else {
+            window.location.replace('/login');
+        }
+    </script>
+</body>
+</html>

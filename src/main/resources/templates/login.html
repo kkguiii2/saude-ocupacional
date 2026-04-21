@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Saúde Ocupacional</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        body { 
+            opacity: 0; 
+            animation: pageFade 0.5s ease-out forwards; 
+        }
+        
+        @keyframes pageFade { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        .login-bg-pattern {
+            background-image: 
+                radial-gradient(ellipse at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 60%);
+        }
+        
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+        
+        .input-focus:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-login {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="auth-container login-bg-pattern">
+    <div class="auth-card animate-slideUp">
+        <!-- Logo -->
+        <div class="auth-logo float-animation">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
+        </div>
+        
+        <!-- Title -->
+        <h1 class="auth-title">Saúde<span>Ocupacional</span></h1>
+        <p class="auth-subtitle">Sistema de Gestão de Saúde do Trabalhador</p>
+        
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-5 mt-8">
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username" class="form-label">Usuário</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </span>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        class="form-input pl-12 input-focus"
+                        placeholder="Digite seu usuário"
+                        autocomplete="username"
+                    >
+                </div>
+            </div>
+            
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password" class="form-label">Senha</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </span>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        class="form-input pl-12 input-focus"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                    >
+                </div>
+            </div>
+            
+            <!-- Error Message -->
+            <div id="errorMessage" class="alert alert-danger flex items-center" style="display: none;">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span id="errorText">Erro de autenticação</span>
+            </div>
+            
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                id="loginBtn"
+                class="btn btn-primary btn-lg btn-block btn-login flex items-center justify-center gap-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                </svg>
+                <span>Entrar no Sistema</span>
+            </button>
+        </form>
+        
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const btn = document.getElementById('loginBtn');
+                const errorDiv = document.getElementById('errorMessage');
+
+                if (!username || !password) return;
+
+                btn.disabled = true;
+                btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Entrando...</span>';
+                errorDiv.style.display = 'none';
+
+                try {
+                    console.log('[Login] Enviando credenciais para /api/auth/login...');
+
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    console.log('[Login] Resposta HTTP:', response.status);
+                    const data = await response.json();
+                    console.log('[Login] Dados recebidos:', { username: data.username, token: data.token ? data.token.substring(0,30)+'...' : 'AUSENTE' });
+
+                    if (response.ok && data.token) {
+                        // Salva token e verifica antes de navegar
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user', JSON.stringify(data));
+
+                        // Confirma que foi salvo
+                        const verificado = localStorage.getItem('token');
+                        console.log('[Login] Token verificado no storage:', verificado ? 'SIM (' + verificado.substring(0,20) + '...)' : 'FALHOU!');
+
+                        if (!verificado) {
+                            throw new Error('Falha ao salvar token no localStorage');
+                        }
+
+                        console.log('[Login] Redirecionando para /dashboard...');
+                        window.location.replace('/dashboard');
+                    } else {
+                        const msg = data.error || data.message || 'Credenciais inválidas';
+                        console.warn('[Login] Falha:', msg);
+                        errorDiv.style.display = 'flex';
+                        document.getElementById('errorText').textContent = msg;
+                    }
+                } catch (error) {
+                    console.error('[Login] Erro:', error);
+                    errorDiv.style.display = 'flex';
+                    document.getElementById('errorText').textContent = error.message.includes('localStorage')
+                        ? 'Erro ao salvar sessão. Verifique se cookies/storage estão habilitados.'
+                        : 'Erro de conexão com o servidor.';
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg><span>Entrar no Sistema</span>';
+                }
+            });
+        </script>
+        
+        <!-- Footer -->
+        <div class="mt-8 pt-6 border-t border-slate-200">
+            <p class="text-center text-sm text-slate-500 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                Sistema interno - Uso autorizado
+            </p>
+        </div>
+    </div>
+</body>
+</html>

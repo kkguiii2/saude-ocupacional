@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Saúde Ocupacional</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' },
+                        blue: { 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb' },
+                        emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669' },
+                        red: { 400: '#f87171', 500: '#ef4444', 600: '#dc2626' },
+                        amber: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
+                        purple: { 400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        body { 
+            opacity: 0; 
+            animation: pageFade 0.4s ease-out forwards; 
+        }
+        
+        @keyframes pageFade { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        .stat-card { 
+            animation: slideUp 0.4s ease-out backwards; 
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.15s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.25s; }
+        
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+    </style>
+</head>
+<body class="bg-slate-100">
+    <div class="app-layout">
+        <!-- Mobile Overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden" onclick="toggleSidebar()"></div>
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar sidebar-transition fixed lg:relative z-50">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <div class="whitespace-nowrap">
+                        <div class="sidebar-brand-text">Saúde</div>
+                        <div class="sidebar-brand-subtitle">Ocupacional</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-section">
+                    <a href="/dashboard" class="sidebar-nav-link active">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                        <span class="whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="/colaboradores" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <span class="whitespace-nowrap">Colaboradores</span>
+                    </a>
+                    <a href="/atendimento" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        <span class="whitespace-nowrap">Atendimentos</span>
+                    </a>
+                    <a href="/acidentes" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="whitespace-nowrap">Acidentes</span>
+                    </a>
+                    <a href="/agendamentos" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="whitespace-nowrap">Agendamentos</span>
+                    </a>
+                    <a href="/estoque" class="sidebar-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <span class="whitespace-nowrap">Estoque</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="sidebar-footer-text"></div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden header-icon-btn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <button onclick="toggleCollapse()" class="hidden lg:block header-icon-btn" title="Colapsar menu">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <div>
+                        <h1 class="text-lg font-semibold text-slate-800">Dashboard</h1>
+                        <p class="text-sm text-slate-500">Visão geral do sistema</p>
+                    </div>
+                </div>
+                <div class="app-header-right">
+                    <button class="header-icon-btn" title="Notificações">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        <span class="badge"></span>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div class="user-name">MicroMicro LTDA</div>
+                            <div class="user-role">Av. Cupiúba 350</div>
+                        </div>
+                        <div class="user-avatar">SO</div>
+                        <button onclick="logout()" class="header-icon-btn" title="Sair">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content -->
+            <div class="content-area">
+                <!-- Alertas -->
+                <div id="alertas-section" class="mb-6 hidden">
+                    <div class="alert alert-warning">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <div>
+                            <h3 class="font-semibold mb-1">Alertas do Sistema</h3>
+                            <div id="alertas-list" class="text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Colaboradores -->
+                    <div class="stat-card bg-white rounded-xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-3xl font-bold text-slate-800" id="total-colaboradores">-</div>
+                                <div class="text-sm text-slate-500 mt-2">Total Colaboradores</div>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Atendimentos Hoje -->
+                    <div class="stat-card bg-white rounded-xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-3xl font-bold text-slate-800" id="atendimentos-hoje">-</div>
+                                <div class="text-sm text-slate-500 mt-2">Atendimentos Hoje</div>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergências Hoje -->
+                    <div class="stat-card bg-white rounded-xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-3xl font-bold text-slate-800" id="emergencias-hoje">-</div>
+                                <div class="text-sm text-slate-500 mt-2">Emergências Hoje</div>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-red-50 flex items-center justify-center text-red-600">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Acidentes Mês -->
+                    <div class="stat-card bg-white rounded-xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-3xl font-bold text-slate-800" id="acidentes-mes">-</div>
+                                <div class="text-sm text-slate-500 mt-2">Acidentes no Mês</div>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Afastamentos Ativos -->
+                    <div class="stat-card bg-white rounded-xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-3xl font-bold text-slate-800" id="afastamentos">-</div>
+                                <div class="text-sm text-slate-500 mt-2">Afastamentos Ativos</div>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estoque Baixo -->
+                    <div class="stat-card bg-white rounded-xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-3xl font-bold text-slate-800" id="estoque-baixo">-</div>
+                                <div class="text-sm text-slate-500 mt-2">Itens Estoque Baixo</div>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Atendimentos por Setor -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Atendimentos por Setor</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="chartSetor"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Acidentes por Tipo -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Acidentes por Tipo</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="chartAcidentes"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tables -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Atendimentos por Setor</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Setor</th>
+                                        <th>Quantidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-setor">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Acidentes por Tipo</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Quantidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-tipo">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script th:src="@{/js/app.js}"></script>
+    <script>
+        let chartSetor, chartAcidentes;
+        let collapsed = false;
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+        
+        function toggleCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            collapsed = !collapsed;
+            
+            if (collapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.style.marginLeft = '80px';
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.style.marginLeft = '280px';
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+        
+        async function loadAlertas() {
+            try {
+                const alertas = await Alertas.getAll();
+                if (alertas && alertas.totalPendencias > 0) {
+                    document.getElementById('alertas-section').classList.remove('hidden');
+                    const list = document.getElementById('alertas-list');
+                    let html = '';
+                    
+                    if (alertas.examesVencidos?.length > 0) {
+                        html += `<div class="mb-1">⚠️ ${alertas.examesVencidos.length} exames próximos do vencimento</div>`;
+                    }
+                    if (alertas.afastamentos?.length > 0) {
+                        html += `<div class="mb-1">🏥 ${alertas.afastamentos.length} colaboradores afastados</div>`;
+                    }
+                    if (alertas.colaboradoresRiscoAlto?.length > 0) {
+                        html += `<div class="mb-1">⚠️ ${alertas.colaboradoresRiscoAlto.length} colaboradores em risco alto</div>`;
+                    }
+                    
+                    list.innerHTML = html;
+                }
+            } catch (err) {
+                console.error('Alertas:', err);
+            }
+        }
+        
+        async function loadDashboard() {
+            try {
+                const data = await Dashboard.getDados();
+                document.getElementById('total-colaboradores').textContent = data.totalColaboradores || 0;
+                document.getElementById('atendimentos-hoje').textContent = data.atendimentosHoje || 0;
+                document.getElementById('emergencias-hoje').textContent = data.emergenciasHoje || 0;
+                document.getElementById('acidentes-mes').textContent = data.acidentesMes || 0;
+                document.getElementById('afastamentos').textContent = data.afastamentosAtivos || 0;
+                document.getElementById('estoque-baixo').textContent = data.estoqueBaixo || 0;
+                
+                const tableSetor = document.querySelector('#table-setor');
+                tableSetor.innerHTML = '';
+                if (data.atendimentosPorSetor) {
+                    for (const [setor, qtd] of Object.entries(data.atendimentosPorSetor)) {
+                        tableSetor.innerHTML += `<tr><td class="font-medium text-slate-700">${setor}</td><td class="font-semibold text-slate-800">${qtd}</td></tr>`;
+                    }
+                }
+                
+                const tableTipo = document.querySelector('#table-tipo');
+                tableTipo.innerHTML = '';
+                if (data.acidentesPorTipo) {
+                    for (const [tipo, qtd] of Object.entries(data.acidentesPorTipo)) {
+                        tableTipo.innerHTML += `<tr><td class="font-medium text-slate-700">${tipo}</td><td class="font-semibold text-slate-800">${qtd}</td></tr>`;
+                    }
+                }
+                
+                initCharts(data);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        
+        function initCharts(data) {
+            const setorData = data.atendimentosPorSetor || {};
+            const tipoData = data.acidentesPorTipo || {};
+            
+            // Doughnut Chart - Atendimentos por Setor
+            chartSetor = new Chart(document.getElementById('chartSetor'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(setorData),
+                    datasets: [{
+                        data: Object.values(setorData),
+                        backgroundColor: [
+                            '#2563EB',
+                            '#10B981',
+                            '#F59E0B',
+                            '#EF4444',
+                            '#8B5CF6',
+                            '#EC4899'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { family: 'Inter', size: 12 }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+            
+            // Bar Chart - Acidentes por Tipo
+            chartAcidentes = new Chart(document.getElementById('chartAcidentes'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(tipoData),
+                    datasets: [{
+                        label: 'Quantidade',
+                        data: Object.values(tipoData),
+                        backgroundColor: '#EF4444',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#F1F5F9' },
+                            ticks: { font: { family: 'Inter', size: 11 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // ── Guard de autenticação (DEVE vir PRIMEIRO) ──────────────────────
+        // A página é pública no Spring Security, mas o token é obrigatório
+        // para acessar os dados via API. Se não há token, redireciona para login.
+        if (!localStorage.getItem('token')) {
+            window.location.replace('/login');
+        } else {
+            // Só carrega dados se autenticado
+            loadAlertas();
+            loadDashboard();
+        }
+    </script>
+</body>
+</html>

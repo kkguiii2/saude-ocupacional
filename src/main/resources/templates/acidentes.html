@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Acidentes - Saúde Ocupacional</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        body { opacity: 0; animation: pageFade 0.3s ease-out forwards; }
+        @keyframes pageFade { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-slate-100">
+    <div class="app-layout">
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden" onclick="toggleSidebar()"></div>
+        
+        <aside id="sidebar" class="sidebar sidebar-transition fixed lg:relative z-50">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <div class="whitespace-nowrap">
+                        <div class="sidebar-brand-text">Saúde</div>
+                        <div class="sidebar-brand-subtitle">Ocupacional</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-section">
+                    <a href="/dashboard" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg><span class="whitespace-nowrap">Dashboard</span></a>
+                    <a href="/colaboradores" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg><span class="whitespace-nowrap">Colaboradores</span></a>
+                    <a href="/atendimento" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span class="whitespace-nowrap">Atendimentos</span></a>
+                    <a href="/acidentes" class="sidebar-nav-link active"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><span class="whitespace-nowrap">Acidentes</span></a>
+                    <a href="/agendamentos" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="whitespace-nowrap">Agendamentos</span></a>
+                    <a href="/estoque" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><span class="whitespace-nowrap">Estoque</span></a>
+                </div>
+            </nav>
+            <div class="sidebar-footer"><div class="sidebar-footer-text"></div></div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="app-header">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden header-icon-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+                    <button onclick="toggleCollapse()" class="hidden lg:block header-icon-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+                    <div><h1 class="text-lg font-semibold text-slate-800">Acidentes</h1><p class="text-sm text-slate-500">Registro de acidentes de trabalho</p></div>
+                </div>
+                <div class="app-header-right">
+                    <button onclick="logout()" class="header-icon-btn" title="Sair"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
+                </div>
+            </header>
+            
+            <div class="content-area space-y-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Registro de Acidentes</h2>
+                        <button onclick="showModal('modal-acidente')" class="btn btn-success btn-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Novo Acidente
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead><tr><th>Data</th><th>Colaborador</th><th>Local</th><th>Tipo</th><th>CAT</th><th>Ações</th></tr></thead>
+                                <tbody id="tabela-acidentes"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-l-4 border-l-amber-500">
+                    <div class="card-header bg-amber-50">
+                        <h2 class="card-title text-amber-600">CATs Pendentes</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead><tr><th>Data</th><th>Colaborador</th><th>Tipo</th><th>Ação</th></tr></thead>
+                                <tbody id="tabela-cats"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal -->
+    <div id="modal-acidente" class="modal-overlay">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title">Novo Acidente</h2>
+                <button onclick="hideModal('modal-acidente')" class="modal-close"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-acidente" class="space-y-4">
+                    <div class="form-group"><label class="form-label">Matrícula do Colaborador</label><input type="text" id="acid-colab-matricula" required class="form-input" placeholder="Digite a matrícula"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group"><label class="form-label">Data/Hora</label><input type="datetime-local" id="acid-data" required class="form-input"></div>
+                        <div class="form-group"><label class="form-label">Local na Fábrica</label><input type="text" id="acid-localFabrica" required class="form-input"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Acidente</label>
+                        <select id="acid-tipo" required class="form-input">
+                            <option value="CORTE">Corte</option>
+                            <option value="QUEIMA">Queimadura</option>
+                            <option value="QUEDA">Queda</option>
+                            <option value="ATROPELAMENTO">Atropelamento</option>
+                            <option value="INTOXICACAO">Intoxicação</option>
+                            <option value="ESMAGAMENTO">Esmagamento</option>
+                            <option value="CHOQUE_ELETRICO">Choque Elétrico</option>
+                            <option value="QUEDA_OBJETO">Queda de Objeto</option>
+                            <option value="OUTROS">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">Descrição</label><textarea id="acid-desc" rows="3" class="form-input"></textarea></div>
+                    <div class="form-group"><label class="form-label">Causa</label><input type="text" id="acid-causa" class="form-input"></div>
+                    <div class="form-group"><label class="form-label">Medidas Tomadas</label><textarea id="acid-medidas" rows="2" class="form-input"></textarea></div>
+                    <div class="form-group"><label class="form-label">Testemunhas</label><input type="text" id="acid-testemunhas" class="form-input"></div>
+                    <div class="pt-4"><button type="submit" class="btn btn-primary btn-block">Registrar</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/app.js}"></script>
+    <script>
+        let collapsed = false;
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
+        function toggleCollapse() { const sidebar = document.getElementById('sidebar'); const mainContent = document.querySelector('.main-content'); collapsed = !collapsed; sidebar.classList.toggle('collapsed'); mainContent.style.marginLeft = collapsed ? '80px' : '280px'; }
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        async function loadAcidentes() {
+            const data = await Acidentes.getMes();
+            const tbody = document.getElementById('tabela-acidentes');
+            tbody.innerHTML = '';
+            data.forEach(a => {
+                const catBadge = a.catEmitida ? `<span class="badge badge-success">${a.numeroCat}</span>` : `<span class="badge badge-warning">Pendente</span>`;
+                const catBtn = a.catEmitida ? '' : `<button onclick="emitirCat(${a.id})" class="btn btn-warning btn-sm">Emitir CAT</button>`;
+                tbody.innerHTML += `<tr>
+                    <td class="font-medium text-slate-700">${new Date(a.dataHora).toLocaleString('pt-BR')}</td>
+                    <td class="text-slate-600">${a.colaboradorNome}</td>
+                    <td class="text-slate-600">${a.localFabrica}</td>
+                    <td class="text-slate-600">${a.tipo}</td>
+                    <td>${catBadge}</td>
+                    <td>${catBtn}</td>
+                </tr>`;
+            });
+        }
+        
+        async function loadCats() {
+            const data = await Acidentes.getPendentes();
+            const tbody = document.getElementById('tabela-cats');
+            tbody.innerHTML = '';
+            data.forEach(a => {
+                tbody.innerHTML += `<tr>
+                    <td class="font-medium text-slate-700">${new Date(a.dataHora).toLocaleString('pt-BR')}</td>
+                    <td class="text-slate-600">${a.colaboradorNome}</td>
+                    <td class="text-slate-600">${a.tipo}</td>
+                    <td><button onclick="emitirCat(${a.id})" class="btn btn-warning btn-sm">Emitir CAT</button></td>
+                </tr>`;
+            });
+        }
+        
+        async function emitirCat(id) { await Acidentes.emitirCat(id); loadAcidentes(); loadCats(); }
+        
+        document.getElementById('form-acidente').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const data = {
+                    colaboradorMatricula: document.getElementById('acid-colab-matricula').value,
+                    dataHora: document.getElementById('acid-data').value,
+                    localFabrica: document.getElementById('acid-localFabrica').value,
+                    tipo: document.getElementById('acid-tipo').value,
+                    descricao: document.getElementById('acid-desc').value,
+                    causa: document.getElementById('acid-causa').value,
+                    medidasTomadas: document.getElementById('acid-medidas').value,
+                    testemunhas: document.getElementById('acid-testemunhas').value
+                };
+                console.log('Salvando acidente:', data);
+                const result = await Acidentes.save(data);
+                console.log('Resultado acidente:', result);
+                if (!result) {
+                    return;
+                }
+                hideModal('modal-acidente');
+                document.getElementById('form-acidente').reset();
+                loadAcidentes();
+                loadCats();
+            } catch (err) { console.error('Erro ao salvar:', err); }
+        });
+        
+        function logout() { localStorage.removeItem('token'); window.location.replace('/login'); }
+        if (localStorage.getItem('token')) {
+            loadAcidentes();
+            loadCats();
+        } else {
+            window.location.replace('/login');
+        }
+    </script>
+</body>
+</html>

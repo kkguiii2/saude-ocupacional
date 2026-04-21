@@ -1,0 +1,26 @@
+# Ignora artefatos de build locais — o Dockerfile compila dentro do container
+target/
+*.jar
+*.war
+*.class
+
+# IDE e sistema
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Variáveis de ambiente locais (não vão para o container)
+.env
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/

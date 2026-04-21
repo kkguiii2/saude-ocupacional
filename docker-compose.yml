@@ -1,0 +1,63 @@
+services:
+
+  # ──────────────────────────────────────────
+  # BANCO DE DADOS PostgreSQL
+  # ──────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: saude-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: micro123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ──────────────────────────────────────────
+  # BACKEND Spring Boot
+  # ──────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: saude-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Banco de dados
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: micro123
+      # Compatibilidade com application.properties (variáveis legadas)
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: micro123
+      # Servidor
+      SERVER_PORT: 8080
+      # JWT
+      JWT_SECRET: saudeOcupacionalSuperSecretKey2024Minimo32Caracteres!
+      JWT_EXPIRATION: 86400000
+      # CORS — permite acesso de qualquer origem da rede local
+      CORS_ORIGINS: "*"
+    ports:
+      - "8080:8080"
+
+# ──────────────────────────────────────────
+# VOLUMES PERSISTENTES
+# ──────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
