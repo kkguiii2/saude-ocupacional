@@ -56,6 +56,135 @@
             position: relative;
             height: 280px;
         }
+        
+        .notification-wrapper {
+            position: relative;
+        }
+        
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .notification-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .notification-dropdown-body {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s;
+        }
+        
+        .notification-item:hover {
+            background: #f8fafc;
+        }
+        
+        .notification-item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .notification-item-content {
+            flex: 1;
+        }
+        
+        .notification-item-title {
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        
+        .notification-item-subtitle {
+            color: #64748b;
+            font-size: 12px;
+        }
+        
+        .notification-toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification-toast {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 16px;
+            max-width: 350px;
+        }
+        
+        .notification-toast-warning {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .notification-toast-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .notification-toast-body {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.5;
+        }
+        
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .badge.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-slate-100">
@@ -146,12 +275,23 @@
                     </div>
                 </div>
                 <div class="app-header-right">
-                    <button class="header-icon-btn" title="Notificações">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                        <span class="badge"></span>
-                    </button>
+                    <div class="notification-wrapper">
+                        <button id="btn-notificacoes" class="header-icon-btn" title="Notificações" onclick="toggleNotificacoes()">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <span id="notification-badge" class="badge hidden"></span>
+                        </button>
+                        <div id="notification-dropdown" class="notification-dropdown hidden">
+                            <div class="notification-dropdown-header">
+                                <span>Notificações</span>
+                                <button onclick="verificarEstoque()" class="text-xs text-blue-600 hover:underline">Atualizar</button>
+                            </div>
+                            <div id="notification-list" class="notification-dropdown-body">
+                                <div class="text-sm text-slate-500 p-2">Carregando...</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="user-menu">
                         <div class="user-info">
                             <div class="user-name">MicroMicro LTDA</div>
@@ -372,8 +512,83 @@
         
         function logout() {
             localStorage.removeItem('token');
+            Notificacoes.desconectar();
             window.location.href = '/login';
         }
+        
+        let notificationDropdownOpen = false;
+        
+        function toggleNotificacoes() {
+            const dropdown = document.getElementById('notification-dropdown');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                loadNotificacoes();
+                notificationDropdownOpen = true;
+            } else {
+                dropdown.classList.add('hidden');
+                notificationDropdownOpen = false;
+            }
+        }
+        
+        document.addEventListener('click', function(e) {
+            const wrapper = document.querySelector('.notification-wrapper');
+            const dropdown = document.getElementById('notification-dropdown');
+            if (wrapper && !wrapper.contains(e.target) && notificationDropdownOpen) {
+                dropdown.classList.add('hidden');
+                notificationDropdownOpen = false;
+            }
+        });
+        
+        async function loadNotificacoes() {
+            try {
+                const status = await Notificacoes.getStatus();
+                const listEl = document.getElementById('notification-list');
+                const badgeEl = document.getElementById('notification-badge');
+                
+                if (status && status.quantidade > 0) {
+                    badgeEl.textContent = status.quantidade;
+                    badgeEl.classList.remove('hidden');
+                    
+                    let html = '';
+                    status.itens.forEach(item => {
+                        html += `
+                            <div class="notification-item">
+                                <div class="notification-item-icon bg-orange-100 text-orange-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                    </svg>
+                                </div>
+                                <div class="notification-item-content">
+                                    <div class="notification-item-title">${item.nome}</div>
+                                    <div class="notification-item-subtitle">Estoque: ${item.quantidadeAtual}/${item.quantidadeMinima} ${item.unidade}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    listEl.innerHTML = html;
+                } else {
+                    badgeEl.classList.add('hidden');
+                    listEl.innerHTML = '<div class="text-sm text-slate-500 p-4 text-center">Nenhum alerta de estoque</div>';
+                }
+            } catch (err) {
+                console.error('Erro ao carregar notificacoes:', err);
+            }
+        }
+        
+        async function verificarEstoque() {
+            try {
+                await Notificacoes.verificar();
+                loadNotificacoes();
+            } catch (err) {
+                console.error('Erro ao verificar estoque:', err);
+            }
+        }
+        
+        Notificacoes.adicionarOuvinte((notif) => {
+            if (notif.tipo === 'ESTOQUE_BAIXO') {
+                loadNotificacoes();
+            }
+        });
         
         async function loadAlertas() {
             try {
@@ -516,6 +731,8 @@
             // Só carrega dados se autenticado
             loadAlertas();
             loadDashboard();
+            Notificacoes.conectar();
+            loadNotificacoes();
         }
     </script>
 </body>

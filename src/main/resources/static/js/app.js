@@ -299,6 +299,90 @@ const Alertas = {
     }
 };
 
+const Notificacoes = {
+    emitter: null,
+    ouvintes: [],
+    
+    conectar: async () => {
+        const token = getToken();
+        if (!token) return;
+        
+        try {
+            Notificacoes.emitter = new EventSource('/api/notificacoes/stream', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            Notificacoes.emitter.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    Notificacoes.ouvintes.forEach(fn => fn(data));
+                } catch (e) {}
+            };
+            
+            Notificacoes.emitter.addEventListener('ESTOQUE_BAIXO', (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    Notificacoes.ouvintes.forEach(fn => fn({ tipo: 'ESTOQUE_BAIXO', dados: data }));
+                    Notificacoes.mostrarToastEstoqueBaixo(data);
+                } catch (e) {
+                    console.error('[Notificacoes] Erro ao processar:', e);
+                }
+            });
+            
+            Notificacoes.emitter.onerror = (err) => {
+                console.error('[Notificacoes] Erro SSE:', err);
+                Notificacoes.desconectar();
+                setTimeout(() => Notificacoes.conectar(), 5000);
+            };
+        } catch (err) {
+            console.error('[Notificacoes] Erro ao conectar:', err);
+        }
+    },
+    
+    desconectar: () => {
+        if (Notificacoes.emitter) {
+            Notificacoes.emitter.close();
+            Notificacoes.emitter = null;
+        }
+    },
+    
+    adicionarOuvinte: (fn) => {
+        Notificacoes.ouvintes.push(fn);
+    },
+    
+    getStatus: async () => {
+        const r = await apiRequest('/notificacoes/estoque-baixo');
+        return r;
+    },
+    
+    verificar: async () => {
+        const r = await apiRequest('/notificacoes/verificar');
+        return r;
+    },
+    
+    mostrarToastEstoqueBaixo: (itens) => {
+        if (!itens || itens.length === 0) return;
+        
+        const container = document.createElement('div');
+        container.className = 'notification-toast-container';
+        container.innerHTML = `
+            <div class="notification-toast notification-toast-warning">
+                <div class="notification-toast-header">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>Estoque Baixo</span>
+                </div>
+                <div class="notification-toast-body">
+                    ${itens.map(i => `<div>• ${i.nome}: ${i.quantidadeAtual}/${i.quantidadeMinima} ${i.unidade}</div>`).join('')}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(container);
+        setTimeout(() => container.remove(), 10000);
+    }
+};
+
 // ─── UI Helpers ───────────────────────────────────────────────────────────────
 
 function showModal(id) {
