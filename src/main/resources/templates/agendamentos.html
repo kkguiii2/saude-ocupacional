@@ -27,7 +27,7 @@
     <div class="app-layout">
         <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden" onclick="toggleSidebar()"></div>
         
-        <aside id="sidebar" class="sidebar sidebar-transition fixed lg:relative z-50">
+        <aside id="sidebar" class="sidebar sidebar-transition fixed z-50">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
                     <div class="sidebar-brand-icon">
@@ -153,17 +153,13 @@
             e.preventDefault();
             try {
                 const data = {
-                    collaboratorMatricula: document.getElementById('age-colab-matricula').value,
+                    colaboradorMatricula: document.getElementById('age-colab-matricula').value,
                     dataHora: document.getElementById('age-data').value,
                     tipo: document.getElementById('age-tipo').value,
                     observacoes: document.getElementById('age-obs').value
                 };
                 console.log('Salvando agendamento:', data);
-                const result = await Agendamentos.save(data);
-                console.log('Resultado agendamento:', result);
-                if (!result) {
-                    return;
-                }
+                await Agendamentos.save(data);
                 hideModal('modal-agendamento');
                 document.getElementById('form-agendamento').reset();
                 loadAgendamentos();
