@@ -618,6 +618,17 @@
         async function loadDashboard() {
             try {
                 const data = await Dashboard.getDados();
+                console.log('loadDashboard: dados recebidos:', data);
+                if (!data) {
+                    console.warn('loadDashboard: dados nulos, usando valores padrao');
+                    document.getElementById('total-colaboradores').textContent = '-';
+                    document.getElementById('atendimentos-hoje').textContent = '-';
+                    document.getElementById('emergencias-hoje').textContent = '-';
+                    document.getElementById('acidentes-mes').textContent = '-';
+                    document.getElementById('afastamentos').textContent = '-';
+                    document.getElementById('estoque-baixo').textContent = '-';
+                    return;
+                }
                 document.getElementById('total-colaboradores').textContent = data.totalColaboradores || 0;
                 document.getElementById('atendimentos-hoje').textContent = data.atendimentosHoje || 0;
                 document.getElementById('emergencias-hoje').textContent = data.emergenciasHoje || 0;
@@ -627,23 +638,27 @@
                 
                 const tableSetor = document.querySelector('#table-setor');
                 tableSetor.innerHTML = '';
-                if (data.atendimentosPorSetor) {
+                if (data.atendimentosPorSetor && Object.keys(data.atendimentosPorSetor).length > 0) {
                     for (const [setor, qtd] of Object.entries(data.atendimentosPorSetor)) {
                         tableSetor.innerHTML += `<tr><td class="font-medium text-slate-700">${setor}</td><td class="font-semibold text-slate-800">${qtd}</td></tr>`;
                     }
+                } else {
+                    tableSetor.innerHTML = '<tr><td colspan="2" class="text-center text-slate-500">Sem dados</td></tr>';
                 }
                 
                 const tableTipo = document.querySelector('#table-tipo');
                 tableTipo.innerHTML = '';
-                if (data.acidentesPorTipo) {
+                if (data.acidentesPorTipo && Object.keys(data.acidentesPorTipo).length > 0) {
                     for (const [tipo, qtd] of Object.entries(data.acidentesPorTipo)) {
                         tableTipo.innerHTML += `<tr><td class="font-medium text-slate-700">${tipo}</td><td class="font-semibold text-slate-800">${qtd}</td></tr>`;
                     }
+                } else {
+                    tableTipo.innerHTML = '<tr><td colspan="2" class="text-center text-slate-500">Sem dados</td></tr>';
                 }
                 
                 initCharts(data);
             } catch (err) {
-                console.error(err);
+                console.error('Erro ao carregar dashboard:', err);
             }
         }
         

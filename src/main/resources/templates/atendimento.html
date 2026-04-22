@@ -179,37 +179,55 @@
         function hideModal(id) { document.getElementById(id).classList.remove('active'); }
         
         async function loadAtendimentos() {
-            const data = await Atendimentos.getHoje();
-            const tbody = document.getElementById('tabela-atendimentos');
-            tbody.innerHTML = '';
-            data.forEach(a => {
-                const gravidadeClass = a.gravidade === 'CRITICA' ? 'badge-danger' : a.gravidade === 'GRAVE' ? 'badge-warning' : 'badge-success';
-                const dataHora = a.dataHora ? new Date(a.dataHora).toLocaleString('pt-BR') : '-';
-                tbody.innerHTML += `<tr>
-                    <td class="font-medium text-slate-700">${dataHora}</td>
-                    <td class="text-slate-600">${a.colaboradorNome}</td>
-                    <td class="text-slate-600">${a.colaboradorMatricula}</td>
-                    <td class="text-slate-600">${a.tipo}</td>
-                    <td><span class="badge ${gravidadeClass}">${a.gravidade}</span></td>
-                    <td>${a.emergencia ? '<span class="badge badge-danger">SIM</span>' : '-'}</td>
-                    <td class="text-slate-600">${a.encaminhamento || '-'}</td>
-                </tr>`;
-            });
+            try {
+                const data = await Atendimentos.getHoje();
+                console.log('loadAtendimentos: dados recebidos:', data);
+                const tbody = document.getElementById('tabela-atendimentos');
+                tbody.innerHTML = '';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500">Nenhum atendimento hoje</td></tr>';
+                    return;
+                }
+                data.forEach(a => {
+                    const gravidadeClass = a.gravidade === 'CRITICA' ? 'badge-danger' : a.gravidade === 'GRAVE' ? 'badge-warning' : 'badge-success';
+                    const dataHora = a.dataHora ? new Date(a.dataHora).toLocaleString('pt-BR') : '-';
+                    tbody.innerHTML += `<tr>
+                        <td class="font-medium text-slate-700">${dataHora}</td>
+                        <td class="text-slate-600">${a.colaboradorNome}</td>
+                        <td class="text-slate-600">${a.colaboradorMatricula}</td>
+                        <td class="text-slate-600">${a.tipo}</td>
+                        <td><span class="badge ${gravidadeClass}">${a.gravidade}</span></td>
+                        <td>${a.emergencia ? '<span class="badge badge-danger">SIM</span>' : '-'}</td>
+                        <td class="text-slate-600">${a.encaminhamento || '-'}</td>
+                    </tr>`;
+                });
+            } catch (err) {
+                console.error('Erro ao carregar atendimentos:', err);
+            }
         }
         
         async function loadEmergencias() {
-            const data = await Atendimentos.getEmergencias();
-            const tbody = document.getElementById('tabela-emergencias');
-            tbody.innerHTML = '';
-            data.forEach(a => {
-                const dataHora = a.dataHora ? new Date(a.dataHora).toLocaleString('pt-BR') : '-';
-                tbody.innerHTML += `<tr>
-                    <td class="font-medium text-slate-700">${dataHora}</td>
-                    <td class="text-slate-600">${a.colaboradorNome}</td>
-                    <td class="text-slate-600">${a.sintomas || '-'}</td>
-                    <td><span class="badge badge-danger">${a.gravidade}</span></td>
-                </tr>`;
-            });
+            try {
+                const data = await Atendimentos.getEmergencias();
+                console.log('loadEmergencias: dados recebidos:', data);
+                const tbody = document.getElementById('tabela-emergencias');
+                tbody.innerHTML = '';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-slate-500">Nenhuma emergência</td></tr>';
+                    return;
+                }
+                data.forEach(a => {
+                    const dataHora = a.dataHora ? new Date(a.dataHora).toLocaleString('pt-BR') : '-';
+                    tbody.innerHTML += `<tr>
+                        <td class="font-medium text-slate-700">${dataHora}</td>
+                        <td class="text-slate-600">${a.colaboradorNome}</td>
+                        <td class="text-slate-600">${a.sintomas || '-'}</td>
+                        <td><span class="badge badge-danger">${a.gravidade}</span></td>
+                    </tr>`;
+                });
+            } catch (err) {
+                console.error('Erro ao carregar emergencias:', err);
+            }
         }
         
         document.getElementById('form-atendimento').addEventListener('submit', async (e) => {
@@ -231,7 +249,9 @@
                 document.getElementById('form-atendimento').reset();
                 loadAtendimentos();
                 loadEmergencias();
-            } catch (err) { console.error('Erro ao salvar:', err); }
+            } catch (err) { 
+                console.error('Erro ao salvar:', err);
+            }
         });
         
         function logout() { localStorage.removeItem('token'); window.location.replace('/login'); }
