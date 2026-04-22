@@ -73,7 +73,13 @@ public class AtendimentoService {
         entity.setAtendente(atendente);
         
         if (dto.getDataHora() != null && !dto.getDataHora().isEmpty()) {
-            entity.setDataHora(LocalDateTime.parse(dto.getDataHora()));
+            // HTML datetime-local envia "2026-04-21T15:00" (sem segundos).
+            // LocalDateTime.parse() exige formato ISO completo; normalizamos aqui.
+            String dataHoraStr = dto.getDataHora();
+            if (dataHoraStr.length() == 16) { // yyyy-MM-ddTHH:mm
+                dataHoraStr = dataHoraStr + ":00";
+            }
+            entity.setDataHora(LocalDateTime.parse(dataHoraStr));
         } else {
             entity.setDataHora(LocalDateTime.now());
         }

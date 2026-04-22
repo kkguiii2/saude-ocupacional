@@ -164,7 +164,7 @@
                             <option value="ACOMPANHAMENTO_AMBULATORIO">Acomp. Ambulatório</option>
                         </select>
                     </div>
-                    <div class="pt-4"><button type="submit" class="btn btn-primary btn-block">Registrar</button></div>
+                    <div class="pt-4"><button type="submit" id="btn-registrar-atendimento" class="btn btn-primary btn-block">Registrar</button></div>
                 </form>
             </div>
         </div>
@@ -232,7 +232,11 @@
         
         document.getElementById('form-atendimento').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Registrando...';
             try {
+                const encaminhamentoVal = document.getElementById('atend-encaminhamento').value;
                 const data = {
                     dataHora: document.getElementById('atend-data').value,
                     colaboradorMatricula: document.getElementById('atend-colab-matricula').value,
@@ -240,17 +244,26 @@
                     sintomas: document.getElementById('atend-sintomas').value,
                     gravidade: document.getElementById('atend-gravidade').value,
                     conduta: document.getElementById('atend-conduta').value,
-                    encaminhamento: document.getElementById('atend-encaminhamento').value || null,
+                    encaminhamento: encaminhamentoVal || null,
                     emergencia: document.getElementById('atend-tipo').value === 'EMERGENCIA'
                 };
                 console.log('Salvando atendimento:', data);
-                await Atendimentos.save(data);
+                const resultado = await Atendimentos.save(data);
+                if (!resultado) {
+                    showMessage('Erro ao registrar atendimento. Verifique a matrícula e tente novamente.', 'danger');
+                    return;
+                }
+                showMessage('Atendimento registrado com sucesso!', 'success');
                 hideModal('modal-atendimento');
                 document.getElementById('form-atendimento').reset();
-                loadAtendimentos();
-                loadEmergencias();
-            } catch (err) { 
+                // Aguarda ambas as atualizações antes de continuar
+                await Promise.all([loadAtendimentos(), loadEmergencias()]);
+            } catch (err) {
                 console.error('Erro ao salvar:', err);
+                showMessage('Erro inesperado ao registrar atendimento.', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Registrar';
             }
         });
         

@@ -147,37 +147,40 @@ const Atendimentos = {
     getAll: async () => {
         const r = await apiRequest('/atendimentos');
         if (!r) return [];
+        if (Array.isArray(r)) return r;
         if (r?.data?.content) return r.data.content;
         if (Array.isArray(r?.data)) return r.data;
-        if (Array.isArray(r)) return r;
         return [];
     },
     getHoje: async () => {
         const r = await apiRequest('/atendimentos/hoje');
         if (!r) return [];
+        if (Array.isArray(r)) return r;
         if (r?.data?.content) return r.data.content;
         if (Array.isArray(r?.data)) return r.data;
-        if (Array.isArray(r)) return r;
         return [];
     },
     getEmergencias: async () => {
         const r = await apiRequest('/atendimentos/emergencias');
         if (!r) return [];
+        if (Array.isArray(r)) return r;
         if (r?.data?.content) return r.data.content;
         if (Array.isArray(r?.data)) return r.data;
-        if (Array.isArray(r)) return r;
         return [];
     },
     getByColaborador: async (id) => {
         const r = await apiRequest(`/atendimentos/colaborador/${id}`);
+        if (!r) return [];
+        if (Array.isArray(r)) return r;
         if (r?.data?.content) return r.data.content;
         if (Array.isArray(r?.data)) return r.data;
-        if (Array.isArray(r)) return r;
         return [];
     },
+    // O controller retorna o DTO diretamente (sem envelope {data: ...})
     save: async (data) => {
         const r = await apiRequest('/atendimentos', { method: 'POST', body: JSON.stringify(data) });
-        return r?.data;
+        // r já é o AtendimentoDTO ou null em caso de erro
+        return r;
     }
 };
 

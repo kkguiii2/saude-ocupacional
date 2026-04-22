@@ -666,6 +666,10 @@
             const setorData = data.atendimentosPorSetor || {};
             const tipoData = data.acidentesPorTipo || {};
             
+            // Destrói instâncias anteriores para evitar erro "Canvas is already in use"
+            if (chartSetor) { chartSetor.destroy(); chartSetor = null; }
+            if (chartAcidentes) { chartAcidentes.destroy(); chartAcidentes = null; }
+            
             // Doughnut Chart - Atendimentos por Setor
             chartSetor = new Chart(document.getElementById('chartSetor'), {
                 type: 'doughnut',
@@ -738,8 +742,6 @@
         }
         
         // ── Guard de autenticação (DEVE vir PRIMEIRO) ──────────────────────
-        // A página é pública no Spring Security, mas o token é obrigatório
-        // para acessar os dados via API. Se não há token, redireciona para login.
         if (!localStorage.getItem('token')) {
             window.location.replace('/login');
         } else {
@@ -748,6 +750,8 @@
             loadDashboard();
             Notificacoes.conectar();
             loadNotificacoes();
+            // Auto-refresh a cada 30 segundos para manter métricas e gráficos atualizados
+            setInterval(loadDashboard, 30000);
         }
     </script>
 </body>
