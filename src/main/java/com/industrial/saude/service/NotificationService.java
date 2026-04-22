@@ -40,48 +40,70 @@ public class NotificationService {
     }
 
     public void verificarEEnviarAlerta() {
-        List<Medicamento> itensBaixo = medicamentoRepository.findEstoqueBaixo();
-        
-        List<EstoqueBaixoItem> notificacoes = itensBaixo.stream()
-                .map(m -> new EstoqueBaixoItem(
-                        m.getId(),
-                        m.getNome(),
-                        m.getQuantidadeEstoque(),
-                        m.getQuantidadeMinima(),
-                        m.getUnidade()))
-                .collect(Collectors.toList());
+        try {
+            List<Medicamento> itensBaixo = medicamentoRepository.findEstoqueBaixo();
 
-        ultimaNotificacao = notificacoes;
-        ultimoAlerta = LocalDateTime.now();
+            List<EstoqueBaixoItem> notificacoes = itensBaixo.stream()
+                    .map(EstoqueBaixoItem::fromMedicamento)
+                    .collect(Collectors.toList());
 
-        if (!notificacoes.isEmpty()) {
-            String msg = String.format("ALERTA: %d item(s) com estoque baixo!", notificacoes.size());
-            log.info("[Notification] {}", msg);
-            notificarClientes(notificacoes);
+            ultimaNotificacao = notificacoes;
+            ultimoAlerta = LocalDateTime.now();
+
+            if (!notificacoes.isEmpty()) {
+                String msg = String.format("ALERTA: %d item(s) com estoque baixo!", notificacoes.size());
+                log.info("[Notification] {}", msg);
+                notificarClientes(notificacoes);
+            }
+        } catch (Exception e) {
+            log.error("[Notification] Erro ao verificar estoque: {}", e.getMessage(), e);
         }
     }
 
     public List<EstoqueBaixoItem> getItensEstoqueBaixo() {
-        return medicamentoRepository.findEstoqueBaixo().stream()
-                .map(m -> new EstoqueBaixoItem(
-                        m.getId(),
-                        m.getNome(),
-                        m.getQuantidadeEstoque(),
-                        m.getQuantidadeMinima(),
-                        m.getUnidade()))
-                .collect(Collectors.toList());
+        try {
+            return medicamentoRepository.findEstoqueBaixo().stream()
+                    .map(EstoqueBaixoItem::fromMedicamento)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("[Notification] Erro ao buscar itens estoque baixo: {}", e.getMessage(), e);
+            return new java.util.ArrayList<>();
+        }
     }
 
+    /**
+     * CORREÇÃO DO NPE:
+     *
+     * Map.of() é imutável e lança NullPointerException se QUALQUER chave ou valor
+     * for null — incluindo ultimoAlerta (nullable) e campos do Medicamento como
+     * unidade e quantidadeMinima (colunas sem NOT NULL no banco).
+     *
+     * Solução: usar HashMap que aceita valores null, e garantir que EstoqueBaixoItem
+     * nunca carregue null nos seus campos primitivos/string.
+     */
     public Map<String, Object> getStatus() {
-        List<EstoqueBaixoItem> itens = getItensEstoqueBaixo();
-        boolean temAlerta = !itens.isEmpty();
-        
-        return Map.of(
-                "temAlerta", temAlerta,
-                "quantidade", itens.size(),
-                "ultimoAlerta", ultimoAlerta != null ? ultimoAlerta.toString() : null,
-                "itens", itens
-        );
+        try {
+            List<EstoqueBaixoItem> itens = getItensEstoqueBaixo();
+            boolean temAlerta = !itens.isEmpty();
+
+            // HashMap aceita valores null — Map.of() NÃO aceita (lança NPE)
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("temAlerta", temAlerta);
+            result.put("quantidade", itens.size());
+            // ultimoAlerta pode ser null na primeira execução — usamos string vazia
+            result.put("ultimoAlerta", ultimoAlerta != null ? ultimoAlerta.toString() : "");
+            result.put("itens", itens);
+            return result;
+        } catch (Exception e) {
+            log.error("[Notification] Erro ao montar status: {}", e.getMessage(), e);
+            // Fallback seguro — nunca retorna 500 para o frontend
+            Map<String, Object> fallback = new java.util.HashMap<>();
+            fallback.put("temAlerta", false);
+            fallback.put("quantidade", 0);
+            fallback.put("ultimoAlerta", "");
+            fallback.put("itens", new java.util.ArrayList<>());
+            return fallback;
+        }
     }
 
     public void adicionarOuvinte(SseEmitter emitter) {
@@ -129,10 +151,26 @@ public class NotificationService {
 
         public EstoqueBaixoItem(Long id, String nome, Integer quantidadeAtual, Integer quantidadeMinima, String unidade) {
             this.id = id;
-            this.nome = nome;
-            this.quantidadeAtual = quantidadeAtual;
-            this.quantidadeMinima = quantidadeMinima;
-            this.unidade = unidade;
+            // Garante que campos string nunca sejam null (evita NPE downstream e Map.of)
+            this.nome = nome != null ? nome : "";
+            this.unidade = unidade != null ? unidade : "";
+            // Garante que campos numéricos nunca sejam null
+            this.quantidadeAtual = quantidadeAtual != null ? quantidadeAtual : 0;
+            this.quantidadeMinima = quantidadeMinima != null ? quantidadeMinima : 0;
+        }
+
+        /**
+         * Factory method que sanitiza todos os campos nullable do Medicamento.
+         * quantidadeMinima e unidade não têm NOT NULL no banco, então podem chegar null.
+         */
+        public static EstoqueBaixoItem fromMedicamento(Medicamento m) {
+            return new EstoqueBaixoItem(
+                    m.getId(),
+                    m.getNome(),
+                    m.getQuantidadeEstoque(),
+                    m.getQuantidadeMinima(),   // nullable no banco
+                    m.getUnidade()             // nullable no banco
+            );
         }
 
         public Long getId() { return id; }
