@@ -151,6 +151,9 @@
         
         document.getElementById('form-agendamento').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Registrando...';
             try {
                 const data = {
                     colaboradorMatricula: document.getElementById('age-colab-matricula').value,

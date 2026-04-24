@@ -273,6 +273,9 @@
         
         document.getElementById('form-colaborador').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Registrando...';
             try {
                 const id = document.getElementById('colab-id').value;
                 const data = {
