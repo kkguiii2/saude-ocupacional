@@ -46,4 +46,9 @@ public class WebController {
     public String estoque() {
         return "estoque";
     }
+
+    @GetMapping("/relatorios")
+    public String relatorios() {
+        return "relatorios";
+    }
 }

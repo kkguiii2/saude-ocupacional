@@ -70,7 +70,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/login", "/logout",
                     "/dashboard", "/colaboradores", "/atendimento",
-                    "/acidentes", "/agendamentos", "/estoque"
+                    "/acidentes", "/agendamentos", "/estoque", "/relatorios"
                 ).permitAll()
 
                 // ── Recursos estáticos (públicos)

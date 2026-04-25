@@ -64,7 +64,7 @@ public class Colaborador extends BaseEntity {
     private List<AcidenteTrabalho> acidentes = new ArrayList<>();
 
     public enum Setor {
-        PRODUCAO, MANUTENCAO, LOGISTICA, ADMINISTRATIVO, QUALIDADE, EXPEDICAO, ALMOXARIFADO
+        CQ_EXTRUSAO, MATERIAIS, TI_SUPORTE, COMPRAS, FISCAL, RH, MANUTENCAO_INDUSTRIAL, EXTRUSAO
     }
 
     public enum TipoRisco {
