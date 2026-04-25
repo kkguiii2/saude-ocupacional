@@ -13,6 +13,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -20,6 +21,9 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -62,7 +66,7 @@ public class RelatorioService {
 
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{30, 70});
+        table.setWidths(new float[] { 30, 70 });
 
         addRow(table, "Nº do Atendimento", String.valueOf(atendimento.getId()));
         addRow(table, "Data/Hora", atendimento.getDataHora().format(DATE_FORMATTER));
@@ -78,14 +82,14 @@ public class RelatorioService {
 
         PdfPTable colabTable = new PdfPTable(2);
         colabTable.setWidthPercentage(100);
-        colabTable.setWidths(new float[]{30, 70});
+        colabTable.setWidths(new float[] { 30, 70 });
 
         Colaborador colab = atendimento.getColaborador();
         addRow(colabTable, "Nome", colab.getNomeCompleto());
         addRow(colabTable, "Matrícula", colab.getMatricula());
-        addRow(colabTable, "Setor", colab.getSetor() != null ? colab.getSetor().name() : "");
+        addRow(colabTable, "Setor", colab.getSetor().name());
         addRow(colabTable, "Cargo", colab.getCargo());
-        addRow(colabTable, "Tipo de Risco", colab.getTipoRisco() != null ? colab.getTipoRisco().name() : "");
+        addRow(colabTable, "Tipo de Risco", colab.getTipoRisco().name());
 
         document.add(colabTable);
 
@@ -111,7 +115,7 @@ public class RelatorioService {
 
         PdfPTable profTable = new PdfPTable(2);
         profTable.setWidthPercentage(100);
-        profTable.setWidths(new float[]{30, 70});
+        profTable.setWidths(new float[] { 30, 70 });
 
         Usuario atendente = atendimento.getAtendente();
         addRow(profTable, "Nome do Profissional", atendente.getNome());
@@ -149,17 +153,20 @@ public class RelatorioService {
 
         PdfPTable dadosTable = new PdfPTable(2);
         dadosTable.setWidthPercentage(100);
-        dadosTable.setWidths(new float[]{30, 70});
+        dadosTable.setWidths(new float[] { 30, 70 });
 
         addRow(dadosTable, "Nome", colab.getNomeCompleto());
         addRow(dadosTable, "Matrícula", colab.getMatricula());
-        addRow(dadosTable, "Setor", colab.getSetor() != null ? colab.getSetor().name() : "");
+        addRow(dadosTable, "Setor", colab.getSetor().name());
         addRow(dadosTable, "Cargo", colab.getCargo());
-        addRow(dadosTable, "Data de Admissão", colab.getDataAdmissao() != null ? colab.getDataAdmissao().format(DATE_ONLY) : "N/A");
-        addRow(dadosTable, "Status", colab.getStatusFuncionario() != null ? colab.getStatusFuncionario().name() : "");
-        addRow(dadosTable, "Tipo de Risco", colab.getTipoRisco() != null ? colab.getTipoRisco().name() : "");
-        addRow(dadosTable, "EPI's Obrigatórios", colab.getEpisObrigatorios() != null ? colab.getEpisObrigatorios() : "Nenhum");
-        addRow(dadosTable, "Contato de Emergência", colab.getContatoEmergencia() != null ? colab.getContatoEmergencia() : "N/A");
+        addRow(dadosTable, "Data de Admissão",
+                colab.getDataAdmissao() != null ? colab.getDataAdmissao().format(DATE_ONLY) : "N/A");
+        addRow(dadosTable, "Status", colab.getStatusFuncionario().name());
+        addRow(dadosTable, "Tipo de Risco", colab.getTipoRisco().name());
+        addRow(dadosTable, "EPI's Obrigatórios",
+                colab.getEpisObrigatorios() != null ? colab.getEpisObrigatorios() : "Nenhum");
+        addRow(dadosTable, "Contato de Emergência",
+                colab.getContatoEmergencia() != null ? colab.getContatoEmergencia() : "N/A");
 
         document.add(dadosTable);
 
@@ -173,7 +180,7 @@ public class RelatorioService {
             for (Atendimento a : atendimentos) {
                 PdfPTable atTable = new PdfPTable(2);
                 atTable.setWidthPercentage(100);
-                atTable.setWidths(new float[]{30, 70});
+                atTable.setWidths(new float[] { 30, 70 });
 
                 addRow(atTable, "Data", a.getDataHora().format(DATE_FORMATTER));
                 addRow(atTable, "Tipo", formatTipoAtendimento(a.getTipo()));
@@ -204,7 +211,7 @@ public class RelatorioService {
             for (AcidenteTrabalho ac : accidentes) {
                 PdfPTable acTable = new PdfPTable(2);
                 acTable.setWidthPercentage(100);
-                acTable.setWidths(new float[]{30, 70});
+                acTable.setWidths(new float[] { 30, 70 });
 
                 addRow(acTable, "Data", ac.getDataHora().format(DATE_FORMATTER));
                 addRow(acTable, "Tipo", ac.getTipo().name());
@@ -232,7 +239,7 @@ public class RelatorioService {
             for (Agendamento ag : agendamentos) {
                 PdfPTable agTable = new PdfPTable(2);
                 agTable.setWidthPercentage(100);
-                agTable.setWidths(new float[]{30, 70});
+                agTable.setWidths(new float[] { 30, 70 });
 
                 addRow(agTable, "Data", ag.getDataHora().format(DATE_FORMATTER));
                 addRow(agTable, "Tipo", ag.getTipo().name());
@@ -256,263 +263,167 @@ public class RelatorioService {
 
     public byte[] gerarExcelColaboradores() {
         List<Colaborador> colaboradores = colaboradorRepository.findByAtivoTrue();
-
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Colaboradores");
-
-        CellStyle headerStyle = workbook.createCellStyle();
-        XSSFFont headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setColor(IndexedColors.WHITE.getIndex());
-        headerStyle.setFont(headerFont);
-        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Nome", "Matrícula", "Setor", "Cargo", "Tipo Risco", "Status", "Data Admissão", "EPI's"};
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
-        }
+        String[] headers = { "ID", "Nome", "Matrícula", "Setor", "Cargo", "Tipo Risco", "Status", "Data Admissão", "EPI's" };
+        ExcelStyles s = createExcelHeader(workbook, sheet, headers);
 
         int rowNum = 1;
         for (Colaborador colab : colaboradores) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(colab.getId());
-            row.createCell(1).setCellValue(colab.getNomeCompleto());
-            row.createCell(2).setCellValue(colab.getMatricula());
-            row.createCell(3).setCellValue(colab.getSetor() != null ? colab.getSetor().name() : "");
-            row.createCell(4).setCellValue(colab.getCargo());
-            row.createCell(5).setCellValue(colab.getTipoRisco() != null ? colab.getTipoRisco().name() : "");
-            row.createCell(6).setCellValue(colab.getStatusFuncionario() != null ? colab.getStatusFuncionario().name() : "");
-            row.createCell(7).setCellValue(colab.getDataAdmissao() != null ? colab.getDataAdmissao().toString() : "");
-            row.createCell(8).setCellValue(colab.getEpisObrigatorios() != null ? colab.getEpisObrigatorios() : "");
+            Row row = sheet.createRow(rowNum);
+            styledNumericCell(row, 0, colab.getId(), s, rowNum);
+            styledCell(row, 1, colab.getNomeCompleto(), s, rowNum);
+            styledCell(row, 2, colab.getMatricula(), s, rowNum);
+            styledCell(row, 3, colab.getSetor() != null ? colab.getSetor().name() : "", s, rowNum);
+            styledCell(row, 4, colab.getCargo(), s, rowNum);
+            styledCell(row, 5, colab.getTipoRisco() != null ? colab.getTipoRisco().name() : "", s, rowNum);
+            styledCell(row, 6, colab.getStatusFuncionario() != null ? colab.getStatusFuncionario().name() : "", s, rowNum);
+            styledCell(row, 7, colab.getDataAdmissao() != null ? colab.getDataAdmissao().toString() : "", s, rowNum);
+            styledCell(row, 8, colab.getEpisObrigatorios(), s, rowNum);
+            rowNum++;
         }
-
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
+        for (int i = 0; i < headers.length; i++) sheet.autoSizeColumn(i);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            workbook.write(baos);
-            workbook.close();
-        } catch (IOException e) {
-            log.error("Erro ao gerar Excel: {}", e.getMessage());
-        }
-
+        try { workbook.write(baos); workbook.close(); } catch (IOException e) { log.error("Erro ao gerar Excel: {}", e.getMessage()); }
         return baos.toByteArray();
     }
 
     public byte[] gerarExcelAtendimentos() {
-        List<Atendimento> atendimentos = atendimentoRepository.findAll().stream()
-                .filter(Atendimento::isAtivo)
-                .toList();
-
+        List<Atendimento> atendimentos = atendimentoRepository.findAll().stream().filter(Atendimento::isAtivo).toList();
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Atendimentos");
-
-        CellStyle headerStyle = workbook.createCellStyle();
-        XSSFFont headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setColor(IndexedColors.WHITE.getIndex());
-        headerStyle.setFont(headerFont);
-        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Gravidade", "Emergência", "Sintomas", "Conduta", "Encaminhamento", "Profissional"};
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
-        }
+        String[] headers = { "ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Gravidade", "Emergência", "Sintomas", "Conduta", "Encaminhamento", "Profissional" };
+        ExcelStyles s = createExcelHeader(workbook, sheet, headers);
 
         int rowNum = 1;
         for (Atendimento at : atendimentos) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(at.getId());
-            row.createCell(1).setCellValue(at.getDataHora().format(DATE_FORMATTER));
-            row.createCell(2).setCellValue(at.getColaborador().getNomeCompleto());
-            row.createCell(3).setCellValue(at.getColaborador().getMatricula());
-            row.createCell(4).setCellValue(at.getColaborador().getSetor().name());
-            row.createCell(5).setCellValue(formatTipoAtendimento(at.getTipo()));
-            row.createCell(6).setCellValue(at.getGravidade().name());
-            row.createCell(7).setCellValue(at.isEmergencia() ? "SIM" : "NÃO");
-            row.createCell(8).setCellValue(at.getSintomas() != null ? at.getSintomas() : "");
-            row.createCell(9).setCellValue(at.getConduta() != null ? at.getConduta() : "");
-            row.createCell(10).setCellValue(at.getEncaminhamento() != null ? at.getEncaminhamento().name() : "");
-            row.createCell(11).setCellValue(at.getAtendente() != null ? at.getAtendente().getNome() : "");
+            Row row = sheet.createRow(rowNum);
+            styledNumericCell(row, 0, at.getId(), s, rowNum);
+            styledCell(row, 1, at.getDataHora().format(DATE_FORMATTER), s, rowNum);
+            styledCell(row, 2, at.getColaborador().getNomeCompleto(), s, rowNum);
+            styledCell(row, 3, at.getColaborador().getMatricula(), s, rowNum);
+            styledCell(row, 4, at.getColaborador().getSetor() != null ? at.getColaborador().getSetor().name() : "", s, rowNum);
+            styledCell(row, 5, formatTipoAtendimento(at.getTipo()), s, rowNum);
+            styledCell(row, 6, at.getGravidade().name(), s, rowNum);
+            styledCell(row, 7, at.isEmergencia() ? "SIM" : "NÃO", s, rowNum);
+            styledCell(row, 8, at.getSintomas(), s, rowNum);
+            styledCell(row, 9, at.getConduta(), s, rowNum);
+            styledCell(row, 10, at.getEncaminhamento() != null ? at.getEncaminhamento().name() : "", s, rowNum);
+            styledCell(row, 11, at.getAtendente() != null ? at.getAtendente().getNome() : "", s, rowNum);
+            rowNum++;
         }
-
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
+        for (int i = 0; i < headers.length; i++) sheet.autoSizeColumn(i);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            workbook.write(baos);
-            workbook.close();
-        } catch (IOException e) {
-            log.error("Erro ao gerar Excel: {}", e.getMessage());
-        }
-
+        try { workbook.write(baos); workbook.close(); } catch (IOException e) { log.error("Erro ao gerar Excel: {}", e.getMessage()); }
         return baos.toByteArray();
     }
 
     public byte[] gerarExcelAgendamentos() {
         List<Agendamento> agendamentos = agendamentoRepository.findAll();
-
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Agendamentos");
-
-        CellStyle headerStyle = workbook.createCellStyle();
-        XSSFFont headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setColor(IndexedColors.WHITE.getIndex());
-        headerStyle.setFont(headerFont);
-        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Status", "Observações", "Agendado Por"};
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
-        }
-
+        String[] headers = { "ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Status", "Observações", "Agendado Por" };
+        ExcelStyles s = createExcelHeader(workbook, sheet, headers);
         int rowNum = 1;
         for (Agendamento ag : agendamentos) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(ag.getId());
-            row.createCell(1).setCellValue(ag.getDataHora().format(DATE_FORMATTER));
-            row.createCell(2).setCellValue(ag.getColaborador().getNomeCompleto());
-            row.createCell(3).setCellValue(ag.getColaborador().getMatricula());
-            row.createCell(4).setCellValue(ag.getColaborador().getSetor().name());
-            row.createCell(5).setCellValue(ag.getTipo().name());
-            row.createCell(6).setCellValue(ag.getStatus().name());
-            row.createCell(7).setCellValue(ag.getObservacoes() != null ? ag.getObservacoes() : "");
-            row.createCell(8).setCellValue(ag.getAgendadoPor() != null ? ag.getAgendadoPor().getNome() : "");
+            Row row = sheet.createRow(rowNum);
+            styledNumericCell(row, 0, ag.getId(), s, rowNum);
+            styledCell(row, 1, ag.getDataHora().format(DATE_FORMATTER), s, rowNum);
+            styledCell(row, 2, ag.getColaborador().getNomeCompleto(), s, rowNum);
+            styledCell(row, 3, ag.getColaborador().getMatricula(), s, rowNum);
+            styledCell(row, 4, ag.getColaborador().getSetor() != null ? ag.getColaborador().getSetor().name() : "", s, rowNum);
+            styledCell(row, 5, ag.getTipo().name(), s, rowNum);
+            styledCell(row, 6, ag.getStatus().name(), s, rowNum);
+            styledCell(row, 7, ag.getObservacoes(), s, rowNum);
+            styledCell(row, 8, ag.getAgendadoPor() != null ? ag.getAgendadoPor().getNome() : "", s, rowNum);
+            rowNum++;
         }
-
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
-
+        for (int i = 0; i < headers.length; i++) sheet.autoSizeColumn(i);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            workbook.write(baos);
-            workbook.close();
-        } catch (IOException e) {
-            log.error("Erro ao gerar Excel: {}", e.getMessage());
-        }
-
+        try { workbook.write(baos); workbook.close(); } catch (IOException e) { log.error("Erro ao gerar Excel: {}", e.getMessage()); }
         return baos.toByteArray();
     }
 
     public byte[] gerarExcelEstoque() {
         List<Medicamento> medicamentos = medicamentoRepository.findAll();
         List<MovimentacaoEstoque> movimentacoes = movimentacaoEstoqueRepository.findAll();
-
         XSSFWorkbook workbook = new XSSFWorkbook();
-        Sheet sheetMedicamentos = workbook.createSheet("Medicamentos");
-        Sheet sheetMovimentacoes = workbook.createSheet("Movimentações");
-
-        createExcelHeader(workbook, sheetMedicamentos, new String[]{"ID", "Nome", "Princípio Ativo", "Categoria", "Quantidade", "Mínimo", "Unidade", "Validade", "Lote"});
-        int rowNum = 1;
+        Sheet sm = workbook.createSheet("Medicamentos");
+        Sheet sv = workbook.createSheet("Movimentações");
+        String[] h1 = { "ID", "Nome", "Princípio Ativo", "Categoria", "Quantidade", "Mínimo", "Unidade", "Validade", "Lote" };
+        ExcelStyles s1 = createExcelHeader(workbook, sm, h1);
+        int rn = 1;
         for (Medicamento med : medicamentos) {
-            Row row = sheetMedicamentos.createRow(rowNum++);
-            row.createCell(0).setCellValue(med.getId());
-            row.createCell(1).setCellValue(med.getNome());
-            row.createCell(2).setCellValue(med.getPrincipioAtivo() != null ? med.getPrincipioAtivo() : "");
-            row.createCell(3).setCellValue(med.getCategoria() != null ? med.getCategoria().name() : "");
-            row.createCell(4).setCellValue(med.getQuantidadeEstoque());
-            row.createCell(5).setCellValue(med.getQuantidadeMinima() != null ? med.getQuantidadeMinima() : 0);
-            row.createCell(6).setCellValue(med.getUnidade() != null ? med.getUnidade() : "");
-            row.createCell(7).setCellValue(med.getDataValidade() != null ? med.getDataValidade().format(DATE_FORMATTER) : "");
-            row.createCell(8).setCellValue(med.getLote() != null ? med.getLote() : "");
+            Row row = sm.createRow(rn);
+            styledNumericCell(row, 0, med.getId(), s1, rn);
+            styledCell(row, 1, med.getNome(), s1, rn);
+            styledCell(row, 2, med.getPrincipioAtivo(), s1, rn);
+            styledCell(row, 3, med.getCategoria() != null ? med.getCategoria().name() : "", s1, rn);
+            styledNumericCell(row, 4, med.getQuantidadeEstoque(), s1, rn);
+            styledNumericCell(row, 5, med.getQuantidadeMinima() != null ? med.getQuantidadeMinima() : 0, s1, rn);
+            styledCell(row, 6, med.getUnidade(), s1, rn);
+            styledCell(row, 7, med.getDataValidade() != null ? med.getDataValidade().format(DATE_FORMATTER) : "", s1, rn);
+            styledCell(row, 8, med.getLote(), s1, rn);
+            rn++;
         }
-
-        createExcelHeader(workbook, sheetMovimentacoes, new String[]{"ID", "Data", "Tipo", "Medicamento", "Quantidade", "Descrição", "Usuário"});
-        rowNum = 1;
+        for (int i = 0; i < h1.length; i++) sm.autoSizeColumn(i);
+        String[] h2 = { "ID", "Data", "Tipo", "Medicamento", "Quantidade", "Descrição", "Usuário" };
+        ExcelStyles s2 = createExcelHeader(workbook, sv, h2);
+        rn = 1;
         for (MovimentacaoEstoque mov : movimentacoes) {
-            Row row = sheetMovimentacoes.createRow(rowNum++);
-            row.createCell(0).setCellValue(mov.getId());
-            row.createCell(1).setCellValue(mov.getDataHora().format(DATE_FORMATTER));
-            row.createCell(2).setCellValue(mov.getTipo().name());
-            row.createCell(3).setCellValue(mov.getMedicamento().getNome());
-            row.createCell(4).setCellValue(mov.getQuantidade());
-            row.createCell(5).setCellValue(mov.getMotivo() != null ? mov.getMotivo() : "");
-            row.createCell(6).setCellValue(mov.getResponsavel() != null ? mov.getResponsavel().getNome() : "");
+            Row row = sv.createRow(rn);
+            styledNumericCell(row, 0, mov.getId(), s2, rn);
+            styledCell(row, 1, mov.getDataHora().format(DATE_FORMATTER), s2, rn);
+            styledCell(row, 2, mov.getTipo().name(), s2, rn);
+            styledCell(row, 3, mov.getMedicamento().getNome(), s2, rn);
+            styledNumericCell(row, 4, mov.getQuantidade(), s2, rn);
+            styledCell(row, 5, mov.getMotivo(), s2, rn);
+            styledCell(row, 6, mov.getResponsavel() != null ? mov.getResponsavel().getNome() : "", s2, rn);
+            rn++;
         }
-
-        sheetMedicamentos.autoSizeColumn(0);
-        sheetMedicamentos.autoSizeColumn(1);
-        sheetMedicamentos.autoSizeColumn(2);
-        sheetMedicamentos.autoSizeColumn(3);
-        sheetMedicamentos.autoSizeColumn(4);
-        sheetMovimentacoes.autoSizeColumn(0);
-        sheetMovimentacoes.autoSizeColumn(1);
-        sheetMovimentacoes.autoSizeColumn(2);
-        sheetMovimentacoes.autoSizeColumn(3);
-        sheetMovimentacoes.autoSizeColumn(4);
-
+        for (int i = 0; i < h2.length; i++) sv.autoSizeColumn(i);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            workbook.write(baos);
-            workbook.close();
-        } catch (IOException e) {
-            log.error("Erro ao gerar Excel: {}", e.getMessage());
-        }
-
+        try { workbook.write(baos); workbook.close(); } catch (IOException e) { log.error("Erro ao gerar Excel: {}", e.getMessage()); }
         return baos.toByteArray();
     }
 
     public byte[] gerarExcelAcidentes() {
         List<AcidenteTrabalho> acidentes = acidenteTrabalhoRepository.findAll();
-
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Acidentes de Trabalho");
-
-        createExcelHeader(workbook, sheet, new String[]{"ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Local", "Descrição", "Causa", "CAT Emitida", "Nº CAT", "Registrado Por"});
-
+        String[] headers = { "ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Local", "Descrição", "Causa", "CAT Emitida", "Nº CAT", "Registrado Por" };
+        ExcelStyles s = createExcelHeader(workbook, sheet, headers);
         int rowNum = 1;
         for (AcidenteTrabalho ac : acidentes) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(ac.getId());
-            row.createCell(1).setCellValue(ac.getDataHora().format(DATE_FORMATTER));
-            row.createCell(2).setCellValue(ac.getColaborador().getNomeCompleto());
-            row.createCell(3).setCellValue(ac.getColaborador().getMatricula());
-            row.createCell(4).setCellValue(ac.getColaborador().getSetor().name());
-            row.createCell(5).setCellValue(ac.getTipo().name());
-            row.createCell(6).setCellValue(ac.getLocalFabrica());
-            row.createCell(7).setCellValue(ac.getDescricao() != null ? ac.getDescricao() : "");
-            row.createCell(8).setCellValue(ac.getCausa() != null ? ac.getCausa() : "");
-            row.createCell(9).setCellValue(ac.isCatEmitida() ? "SIM" : "NÃO");
-            row.createCell(10).setCellValue(ac.getNumeroCat() != null ? ac.getNumeroCat() : "");
-            row.createCell(11).setCellValue(ac.getRegistradoPor() != null ? ac.getRegistradoPor().getNome() : "");
+            Row row = sheet.createRow(rowNum);
+            styledNumericCell(row, 0, ac.getId(), s, rowNum);
+            styledCell(row, 1, ac.getDataHora().format(DATE_FORMATTER), s, rowNum);
+            styledCell(row, 2, ac.getColaborador().getNomeCompleto(), s, rowNum);
+            styledCell(row, 3, ac.getColaborador().getMatricula(), s, rowNum);
+            styledCell(row, 4, ac.getColaborador().getSetor() != null ? ac.getColaborador().getSetor().name() : "", s, rowNum);
+            styledCell(row, 5, ac.getTipo().name(), s, rowNum);
+            styledCell(row, 6, ac.getLocalFabrica(), s, rowNum);
+            styledCell(row, 7, ac.getDescricao(), s, rowNum);
+            styledCell(row, 8, ac.getCausa(), s, rowNum);
+            styledCell(row, 9, ac.isCatEmitida() ? "SIM" : "NÃO", s, rowNum);
+            styledCell(row, 10, ac.getNumeroCat(), s, rowNum);
+            styledCell(row, 11, ac.getRegistradoPor() != null ? ac.getRegistradoPor().getNome() : "", s, rowNum);
+            rowNum++;
         }
-
-        for (int i = 0; i < 12; i++) sheet.autoSizeColumn(i);
-
+        for (int i = 0; i < headers.length; i++) sheet.autoSizeColumn(i);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            workbook.write(baos);
-            workbook.close();
-        } catch (IOException e) {
-            log.error("Erro ao gerar Excel de acidentes: {}", e.getMessage());
-        }
+        try { workbook.write(baos); workbook.close(); } catch (IOException e) { log.error("Erro ao gerar Excel de acidentes: {}", e.getMessage()); }
         return baos.toByteArray();
     }
 
     /**
-     * Gera um Excel completo com múltiplas abas de acordo com os módulos selecionados.
-     * @param modulos lista de módulos desejados: colaboradores, atendimentos, agendamentos, acidentes, medicamentos, movimentacoes
+     * Gera um Excel completo com múltiplas abas de acordo com os módulos
+     * selecionados.
+     * 
+     * @param modulos lista de módulos desejados: colaboradores, atendimentos,
+     *                agendamentos, acidentes, medicamentos, movimentacoes
      */
     public byte[] gerarExcelCompleto(List<String> modulos) {
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -520,153 +431,260 @@ public class RelatorioService {
         if (modulos.contains("colaboradores")) {
             List<Colaborador> colaboradores = colaboradorRepository.findAll();
             Sheet sheet = workbook.createSheet("Colaboradores");
-            createExcelHeader(workbook, sheet, new String[]{"ID", "Nome", "Matrícula", "Setor", "Cargo", "Tipo Risco", "Status", "Data Admissão", "EPI's"});
-            int rowNum = 1;
+            String[] h = { "ID", "Nome", "Matrícula", "Setor", "Cargo", "Tipo Risco", "Status", "Data Admissão", "EPI's" };
+            ExcelStyles s = createExcelHeader(workbook, sheet, h);
+            int rn = 1;
             for (Colaborador c : colaboradores) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(c.getId());
-                row.createCell(1).setCellValue(c.getNomeCompleto());
-                row.createCell(2).setCellValue(c.getMatricula());
-                row.createCell(3).setCellValue(c.getSetor() != null ? c.getSetor().name() : "");
-                row.createCell(4).setCellValue(c.getCargo());
-                row.createCell(5).setCellValue(c.getTipoRisco() != null ? c.getTipoRisco().name() : "");
-                row.createCell(6).setCellValue(c.getStatusFuncionario() != null ? c.getStatusFuncionario().name() : "");
-                row.createCell(7).setCellValue(c.getDataAdmissao() != null ? c.getDataAdmissao().toString() : "");
-                row.createCell(8).setCellValue(c.getEpisObrigatorios() != null ? c.getEpisObrigatorios() : "");
+                Row row = sheet.createRow(rn);
+                styledNumericCell(row, 0, c.getId(), s, rn);
+                styledCell(row, 1, c.getNomeCompleto(), s, rn);
+                styledCell(row, 2, c.getMatricula(), s, rn);
+                styledCell(row, 3, c.getSetor() != null ? c.getSetor().name() : "", s, rn);
+                styledCell(row, 4, c.getCargo(), s, rn);
+                styledCell(row, 5, c.getTipoRisco() != null ? c.getTipoRisco().name() : "", s, rn);
+                styledCell(row, 6, c.getStatusFuncionario() != null ? c.getStatusFuncionario().name() : "", s, rn);
+                styledCell(row, 7, c.getDataAdmissao() != null ? c.getDataAdmissao().toString() : "", s, rn);
+                styledCell(row, 8, c.getEpisObrigatorios(), s, rn);
+                rn++;
             }
-            for (int i = 0; i < 9; i++) sheet.autoSizeColumn(i);
+            for (int i = 0; i < h.length; i++) sheet.autoSizeColumn(i);
         }
 
         if (modulos.contains("atendimentos")) {
             List<Atendimento> atendimentos = atendimentoRepository.findAll().stream().filter(Atendimento::isAtivo).toList();
             Sheet sheet = workbook.createSheet("Atendimentos");
-            createExcelHeader(workbook, sheet, new String[]{"ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Gravidade", "Emergência", "Sintomas", "Conduta", "Encaminhamento", "Profissional"});
-            int rowNum = 1;
+            String[] h = { "ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Gravidade", "Emergência", "Sintomas", "Conduta", "Encaminhamento", "Profissional" };
+            ExcelStyles s = createExcelHeader(workbook, sheet, h);
+            int rn = 1;
             for (Atendimento at : atendimentos) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(at.getId());
-                row.createCell(1).setCellValue(at.getDataHora().format(DATE_FORMATTER));
-                row.createCell(2).setCellValue(at.getColaborador().getNomeCompleto());
-                row.createCell(3).setCellValue(at.getColaborador().getMatricula());
-                row.createCell(4).setCellValue(at.getColaborador().getSetor().name());
-                row.createCell(5).setCellValue(formatTipoAtendimento(at.getTipo()));
-                row.createCell(6).setCellValue(at.getGravidade().name());
-                row.createCell(7).setCellValue(at.isEmergencia() ? "SIM" : "NÃO");
-                row.createCell(8).setCellValue(at.getSintomas() != null ? at.getSintomas() : "");
-                row.createCell(9).setCellValue(at.getConduta() != null ? at.getConduta() : "");
-                row.createCell(10).setCellValue(at.getEncaminhamento() != null ? at.getEncaminhamento().name() : "");
-                row.createCell(11).setCellValue(at.getAtendente() != null ? at.getAtendente().getNome() : "");
+                Row row = sheet.createRow(rn);
+                styledNumericCell(row, 0, at.getId(), s, rn);
+                styledCell(row, 1, at.getDataHora().format(DATE_FORMATTER), s, rn);
+                styledCell(row, 2, at.getColaborador().getNomeCompleto(), s, rn);
+                styledCell(row, 3, at.getColaborador().getMatricula(), s, rn);
+                styledCell(row, 4, at.getColaborador().getSetor() != null ? at.getColaborador().getSetor().name() : "", s, rn);
+                styledCell(row, 5, formatTipoAtendimento(at.getTipo()), s, rn);
+                styledCell(row, 6, at.getGravidade().name(), s, rn);
+                styledCell(row, 7, at.isEmergencia() ? "SIM" : "NÃO", s, rn);
+                styledCell(row, 8, at.getSintomas(), s, rn);
+                styledCell(row, 9, at.getConduta(), s, rn);
+                styledCell(row, 10, at.getEncaminhamento() != null ? at.getEncaminhamento().name() : "", s, rn);
+                styledCell(row, 11, at.getAtendente() != null ? at.getAtendente().getNome() : "", s, rn);
+                rn++;
             }
-            for (int i = 0; i < 12; i++) sheet.autoSizeColumn(i);
+            for (int i = 0; i < h.length; i++) sheet.autoSizeColumn(i);
         }
 
         if (modulos.contains("agendamentos")) {
             List<Agendamento> agendamentos = agendamentoRepository.findAll();
             Sheet sheet = workbook.createSheet("Agendamentos");
-            createExcelHeader(workbook, sheet, new String[]{"ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Status", "Observações", "Agendado Por"});
-            int rowNum = 1;
+            String[] h = { "ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Status", "Observações", "Agendado Por" };
+            ExcelStyles s = createExcelHeader(workbook, sheet, h);
+            int rn = 1;
             for (Agendamento ag : agendamentos) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(ag.getId());
-                row.createCell(1).setCellValue(ag.getDataHora().format(DATE_FORMATTER));
-                row.createCell(2).setCellValue(ag.getColaborador().getNomeCompleto());
-                row.createCell(3).setCellValue(ag.getColaborador().getMatricula());
-                row.createCell(4).setCellValue(ag.getColaborador().getSetor().name());
-                row.createCell(5).setCellValue(ag.getTipo().name());
-                row.createCell(6).setCellValue(ag.getStatus().name());
-                row.createCell(7).setCellValue(ag.getObservacoes() != null ? ag.getObservacoes() : "");
-                row.createCell(8).setCellValue(ag.getAgendadoPor() != null ? ag.getAgendadoPor().getNome() : "");
+                Row row = sheet.createRow(rn);
+                styledNumericCell(row, 0, ag.getId(), s, rn);
+                styledCell(row, 1, ag.getDataHora().format(DATE_FORMATTER), s, rn);
+                styledCell(row, 2, ag.getColaborador().getNomeCompleto(), s, rn);
+                styledCell(row, 3, ag.getColaborador().getMatricula(), s, rn);
+                styledCell(row, 4, ag.getColaborador().getSetor() != null ? ag.getColaborador().getSetor().name() : "", s, rn);
+                styledCell(row, 5, ag.getTipo().name(), s, rn);
+                styledCell(row, 6, ag.getStatus().name(), s, rn);
+                styledCell(row, 7, ag.getObservacoes(), s, rn);
+                styledCell(row, 8, ag.getAgendadoPor() != null ? ag.getAgendadoPor().getNome() : "", s, rn);
+                rn++;
             }
-            for (int i = 0; i < 9; i++) sheet.autoSizeColumn(i);
+            for (int i = 0; i < h.length; i++) sheet.autoSizeColumn(i);
         }
 
         if (modulos.contains("acidentes")) {
             List<AcidenteTrabalho> acidentes = acidenteTrabalhoRepository.findAll();
             Sheet sheet = workbook.createSheet("Acidentes de Trabalho");
-            createExcelHeader(workbook, sheet, new String[]{"ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Local", "Descrição", "Causa", "CAT Emitida", "Nº CAT", "Registrado Por"});
-            int rowNum = 1;
+            String[] h = { "ID", "Data/Hora", "Colaborador", "Matrícula", "Setor", "Tipo", "Local", "Descrição", "Causa", "CAT Emitida", "Nº CAT", "Registrado Por" };
+            ExcelStyles s = createExcelHeader(workbook, sheet, h);
+            int rn = 1;
             for (AcidenteTrabalho ac : acidentes) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(ac.getId());
-                row.createCell(1).setCellValue(ac.getDataHora().format(DATE_FORMATTER));
-                row.createCell(2).setCellValue(ac.getColaborador().getNomeCompleto());
-                row.createCell(3).setCellValue(ac.getColaborador().getMatricula());
-                row.createCell(4).setCellValue(ac.getColaborador().getSetor().name());
-                row.createCell(5).setCellValue(ac.getTipo().name());
-                row.createCell(6).setCellValue(ac.getLocalFabrica());
-                row.createCell(7).setCellValue(ac.getDescricao() != null ? ac.getDescricao() : "");
-                row.createCell(8).setCellValue(ac.getCausa() != null ? ac.getCausa() : "");
-                row.createCell(9).setCellValue(ac.isCatEmitida() ? "SIM" : "NÃO");
-                row.createCell(10).setCellValue(ac.getNumeroCat() != null ? ac.getNumeroCat() : "");
-                row.createCell(11).setCellValue(ac.getRegistradoPor() != null ? ac.getRegistradoPor().getNome() : "");
+                Row row = sheet.createRow(rn);
+                styledNumericCell(row, 0, ac.getId(), s, rn);
+                styledCell(row, 1, ac.getDataHora().format(DATE_FORMATTER), s, rn);
+                styledCell(row, 2, ac.getColaborador().getNomeCompleto(), s, rn);
+                styledCell(row, 3, ac.getColaborador().getMatricula(), s, rn);
+                styledCell(row, 4, ac.getColaborador().getSetor() != null ? ac.getColaborador().getSetor().name() : "", s, rn);
+                styledCell(row, 5, ac.getTipo().name(), s, rn);
+                styledCell(row, 6, ac.getLocalFabrica(), s, rn);
+                styledCell(row, 7, ac.getDescricao(), s, rn);
+                styledCell(row, 8, ac.getCausa(), s, rn);
+                styledCell(row, 9, ac.isCatEmitida() ? "SIM" : "NÃO", s, rn);
+                styledCell(row, 10, ac.getNumeroCat(), s, rn);
+                styledCell(row, 11, ac.getRegistradoPor() != null ? ac.getRegistradoPor().getNome() : "", s, rn);
+                rn++;
             }
-            for (int i = 0; i < 12; i++) sheet.autoSizeColumn(i);
+            for (int i = 0; i < h.length; i++) sheet.autoSizeColumn(i);
         }
 
         if (modulos.contains("medicamentos")) {
             List<Medicamento> medicamentos = medicamentoRepository.findAll();
             Sheet sheet = workbook.createSheet("Medicamentos");
-            createExcelHeader(workbook, sheet, new String[]{"ID", "Nome", "Princípio Ativo", "Categoria", "Quantidade", "Mínimo", "Unidade", "Validade", "Lote"});
-            int rowNum = 1;
+            String[] h = { "ID", "Nome", "Princípio Ativo", "Categoria", "Quantidade", "Mínimo", "Unidade", "Validade", "Lote" };
+            ExcelStyles s = createExcelHeader(workbook, sheet, h);
+            int rn = 1;
             for (Medicamento med : medicamentos) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(med.getId());
-                row.createCell(1).setCellValue(med.getNome());
-                row.createCell(2).setCellValue(med.getPrincipioAtivo() != null ? med.getPrincipioAtivo() : "");
-                row.createCell(3).setCellValue(med.getCategoria() != null ? med.getCategoria().name() : "");
-                row.createCell(4).setCellValue(med.getQuantidadeEstoque());
-                row.createCell(5).setCellValue(med.getQuantidadeMinima() != null ? med.getQuantidadeMinima() : 0);
-                row.createCell(6).setCellValue(med.getUnidade() != null ? med.getUnidade() : "");
-                row.createCell(7).setCellValue(med.getDataValidade() != null ? med.getDataValidade().format(DATE_FORMATTER) : "");
-                row.createCell(8).setCellValue(med.getLote() != null ? med.getLote() : "");
+                Row row = sheet.createRow(rn);
+                styledNumericCell(row, 0, med.getId(), s, rn);
+                styledCell(row, 1, med.getNome(), s, rn);
+                styledCell(row, 2, med.getPrincipioAtivo(), s, rn);
+                styledCell(row, 3, med.getCategoria() != null ? med.getCategoria().name() : "", s, rn);
+                styledNumericCell(row, 4, med.getQuantidadeEstoque(), s, rn);
+                styledNumericCell(row, 5, med.getQuantidadeMinima() != null ? med.getQuantidadeMinima() : 0, s, rn);
+                styledCell(row, 6, med.getUnidade(), s, rn);
+                styledCell(row, 7, med.getDataValidade() != null ? med.getDataValidade().format(DATE_FORMATTER) : "", s, rn);
+                styledCell(row, 8, med.getLote(), s, rn);
+                rn++;
             }
-            for (int i = 0; i < 9; i++) sheet.autoSizeColumn(i);
+            for (int i = 0; i < h.length; i++) sheet.autoSizeColumn(i);
         }
 
         if (modulos.contains("movimentacoes")) {
             List<MovimentacaoEstoque> movimentacoes = movimentacaoEstoqueRepository.findAll();
             Sheet sheet = workbook.createSheet("Movimentações Estoque");
-            createExcelHeader(workbook, sheet, new String[]{"ID", "Data", "Tipo", "Medicamento", "Quantidade", "Motivo", "Responsável"});
-            int rowNum = 1;
+            String[] h = { "ID", "Data", "Tipo", "Medicamento", "Quantidade", "Motivo", "Responsável" };
+            ExcelStyles s = createExcelHeader(workbook, sheet, h);
+            int rn = 1;
             for (MovimentacaoEstoque mov : movimentacoes) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(mov.getId());
-                row.createCell(1).setCellValue(mov.getDataHora().format(DATE_FORMATTER));
-                row.createCell(2).setCellValue(mov.getTipo().name());
-                row.createCell(3).setCellValue(mov.getMedicamento().getNome());
-                row.createCell(4).setCellValue(mov.getQuantidade());
-                row.createCell(5).setCellValue(mov.getMotivo() != null ? mov.getMotivo() : "");
-                row.createCell(6).setCellValue(mov.getResponsavel() != null ? mov.getResponsavel().getNome() : "");
+                Row row = sheet.createRow(rn);
+                styledNumericCell(row, 0, mov.getId(), s, rn);
+                styledCell(row, 1, mov.getDataHora().format(DATE_FORMATTER), s, rn);
+                styledCell(row, 2, mov.getTipo().name(), s, rn);
+                styledCell(row, 3, mov.getMedicamento().getNome(), s, rn);
+                styledNumericCell(row, 4, mov.getQuantidade(), s, rn);
+                styledCell(row, 5, mov.getMotivo(), s, rn);
+                styledCell(row, 6, mov.getResponsavel() != null ? mov.getResponsavel().getNome() : "", s, rn);
+                rn++;
             }
-            for (int i = 0; i < 7; i++) sheet.autoSizeColumn(i);
+            for (int i = 0; i < h.length; i++) sheet.autoSizeColumn(i);
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            workbook.write(baos);
-            workbook.close();
-        } catch (IOException e) {
-            log.error("Erro ao gerar Excel completo: {}", e.getMessage());
-        }
+        try { workbook.write(baos); workbook.close(); } catch (IOException e) { log.error("Erro ao gerar Excel completo: {}", e.getMessage()); }
         return baos.toByteArray();
     }
 
-    private void createExcelHeader(XSSFWorkbook workbook, Sheet sheet, String[] headers) {
-        CellStyle headerStyle = workbook.createCellStyle();
-        XSSFFont headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setColor(IndexedColors.WHITE.getIndex());
-        headerStyle.setFont(headerFont);
-        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+    // ─── Inner class that holds the three cell styles for one workbook ────────
+    private static class ExcelStyles {
+        final XSSFCellStyle header;
+        final XSSFCellStyle rowEven;
+        final XSSFCellStyle rowOdd;
+        final XSSFCellStyle rowEvenRight;
+        final XSSFCellStyle rowOddRight;
 
+        ExcelStyles(XSSFCellStyle header, XSSFCellStyle rowEven, XSSFCellStyle rowOdd,
+                XSSFCellStyle rowEvenRight, XSSFCellStyle rowOddRight) {
+            this.header = header;
+            this.rowEven = rowEven;
+            this.rowOdd = rowOdd;
+            this.rowEvenRight = rowEvenRight;
+            this.rowOddRight = rowOddRight;
+        }
+    }
+
+    /** Builds all professional styles once per workbook (avoids POI style-limit). */
+    private ExcelStyles buildStyles(XSSFWorkbook wb) {
+        // ── Header: bold, dark text, light-gray background ──────────────────
+        XSSFCellStyle hStyle = wb.createCellStyle();
+        XSSFFont hFont = wb.createFont();
+        hFont.setBold(true);
+        hFont.setFontHeightInPoints((short) 10);
+        hFont.setColor(IndexedColors.BLACK1.getIndex());
+        hStyle.setFont(hFont);
+        // Light gray (hex #D9D9D9)
+        hStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte)0xD9, (byte)0xD9, (byte)0xD9}, null));
+        hStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        hStyle.setAlignment(HorizontalAlignment.CENTER);
+        applyBorder(hStyle);
+
+        // ── Even row: white background ────────────────────────────────────
+        XSSFCellStyle eStyle = wb.createCellStyle();
+        XSSFFont dataFont = wb.createFont();
+        dataFont.setFontHeightInPoints((short) 10);
+        eStyle.setFont(dataFont);
+        eStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte)0xFF, (byte)0xFF, (byte)0xFF}, null));
+        eStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        eStyle.setAlignment(HorizontalAlignment.LEFT);
+        eStyle.setWrapText(false);
+        applyBorder(eStyle);
+
+        // ── Odd row: very light blue-gray ────────────────────────────────
+        XSSFCellStyle oStyle = wb.createCellStyle();
+        oStyle.setFont(dataFont);
+        oStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte)0xF2, (byte)0xF2, (byte)0xF2}, null));
+        oStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        oStyle.setAlignment(HorizontalAlignment.LEFT);
+        oStyle.setWrapText(false);
+        applyBorder(oStyle);
+
+        // ── Right-aligned variants (for numeric columns) ─────────────────
+        XSSFCellStyle eRight = wb.createCellStyle();
+        eRight.cloneStyleFrom(eStyle);
+        eRight.setAlignment(HorizontalAlignment.RIGHT);
+
+        XSSFCellStyle oRight = wb.createCellStyle();
+        oRight.cloneStyleFrom(oStyle);
+        oRight.setAlignment(HorizontalAlignment.RIGHT);
+
+        return new ExcelStyles(hStyle, eStyle, oStyle, eRight, oRight);
+    }
+
+    /** Applies thin borders to all four sides of a cell style. */
+    private void applyBorder(XSSFCellStyle style) {
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setTopBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        style.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        style.setLeftBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        style.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+    }
+
+    /**
+     * Writes the header row and auto-filter for a sheet, returns the styles to use in data rows.
+     * The numeric column indices (0-based) receive right-aligned style.
+     */
+    private ExcelStyles createExcelHeader(XSSFWorkbook workbook, Sheet sheet, String[] headers) {
+        ExcelStyles styles = buildStyles(workbook);
         Row headerRow = sheet.createRow(0);
+        headerRow.setHeightInPoints(18);
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
+            cell.setCellStyle(styles.header);
         }
+        // Enable auto-filter spanning all header columns
+        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, headers.length - 1));
+        return styles;
+    }
+
+    /** Returns the correct data style (even/odd, left/right) for a given row index and column. */
+    private XSSFCellStyle dataStyle(ExcelStyles styles, int rowNum, boolean rightAlign) {
+        boolean isEven = (rowNum % 2 == 0);
+        if (rightAlign) return isEven ? styles.rowEvenRight : styles.rowOddRight;
+        return isEven ? styles.rowEven : styles.rowOdd;
+    }
+
+    /** Helper: sets a string cell with the appropriate row style. */
+    private Cell styledCell(Row row, int col, String value, ExcelStyles styles, int rowNum) {
+        Cell cell = row.createCell(col);
+        cell.setCellValue(value != null ? value : "");
+        cell.setCellStyle(dataStyle(styles, rowNum, false));
+        return cell;
+    }
+
+    /** Helper: sets a numeric cell (right-aligned) with the appropriate row style. */
+    private Cell styledNumericCell(Row row, int col, double value, ExcelStyles styles, int rowNum) {
+        Cell cell = row.createCell(col);
+        cell.setCellValue(value);
+        cell.setCellStyle(dataStyle(styles, rowNum, true));
+        return cell;
     }
 
     private void addHeader(Document document, String title, String subtitle) throws Exception {
@@ -734,9 +752,8 @@ public class RelatorioService {
         document.add(line);
 
         Paragraph footer = new Paragraph(
-            "Sistema de Saúde Ocupacional - Generated on " + LocalDateTime.now().format(DATE_FORMATTER),
-            font
-        );
+                "Sistema de Saúde Ocupacional - Generated on " + LocalDateTime.now().format(DATE_FORMATTER),
+                font);
         footer.setAlignment(Element.ALIGN_CENTER);
         document.add(footer);
     }
