@@ -24,6 +24,9 @@ public class Usuario extends BaseEntity {
     @Column(name = "perfil", nullable = false)
     private Perfil perfil;
 
+    @Column(name = "matricula")
+    private String matricula;
+
     @Column(name = "ultimo_acesso")
     private LocalDateTime ultimoAcesso;
 
@@ -67,6 +70,14 @@ public class Usuario extends BaseEntity {
 
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
+    }
+
+    public String getMatricula() {
+        return matricula;
+    }
+
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
     }
 
     public LocalDateTime getUltimoAcesso() {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,21 +20,40 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        * { font-family: 'Inter', sans-serif; }
-        body { opacity: 0; animation: pageFade 0.3s ease-out forwards; }
-        @keyframes pageFade { from { opacity: 0; } to { opacity: 1; } }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            opacity: 0;
+            animation: pageFade 0.3s ease-out forwards;
+        }
+
+        @keyframes pageFade {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+
 <body class="bg-slate-100">
     <div class="app-layout">
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden" onclick="toggleSidebar()"></div>
-        
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden" onclick="toggleSidebar()">
+        </div>
+
         <aside id="sidebar" class="sidebar sidebar-transition fixed z-50">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
                     <div class="sidebar-brand-icon">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     </div>
                     <div class="whitespace-nowrap">
@@ -45,30 +65,53 @@
             <nav class="sidebar-nav">
                 <div class="sidebar-nav-section">
                     <a href="/dashboard" class="sidebar-nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
                         <span class="whitespace-nowrap">Dashboard</span>
                     </a>
                     <a href="/colaboradores" class="sidebar-nav-link active">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
                         <span class="whitespace-nowrap">Colaboradores</span>
                     </a>
                     <a href="/atendimento" class="sidebar-nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
                         <span class="whitespace-nowrap">Atendimentos</span>
                     </a>
                     <a href="/acidentes" class="sidebar-nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
                         <span class="whitespace-nowrap">Acidentes</span>
                     </a>
                     <a href="/agendamentos" class="sidebar-nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
                         <span class="whitespace-nowrap">Agendamentos</span>
                     </a>
                     <a href="/estoque" class="sidebar-nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
                         <span class="whitespace-nowrap">Estoque</span>
                     </a>
-                    <a href="/relatorios" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span class="whitespace-nowrap">Relatórios</span></a>
+                    <a href="/relatorios" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg><span class="whitespace-nowrap">Relatórios</span></a>
+                    <a id="btn-usuarios" href="/usuarios" class="sidebar-nav-link" style="display:none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span class="whitespace-nowrap">Usuários</span></a>
 
                 </div>
             </nav>
@@ -76,12 +119,21 @@
                 <div class="sidebar-footer-text"></div>
             </div>
         </aside>
-        
+
         <main class="main-content">
             <header class="app-header">
                 <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden header-icon-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-                    <button onclick="toggleCollapse()" class="hidden lg:block header-icon-btn" title="Colapsar menu"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+                    <button onclick="toggleSidebar()" class="lg:hidden header-icon-btn"><svg class="w-5 h-5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg></button>
+                    <button onclick="toggleCollapse()" class="hidden lg:block header-icon-btn"
+                        title="Colapsar menu"><svg class="w-5 h-5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg></button>
                     <div>
                         <h1 class="text-lg font-semibold text-slate-800">Colaboradores</h1>
                         <p class="text-sm text-slate-500">Gerenciamento de colaboradores</p>
@@ -89,23 +141,30 @@
                 </div>
                 <div class="app-header-right">
                     <button onclick="logout()" class="header-icon-btn" title="Sair">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
                     </button>
                 </div>
             </header>
-            
+
             <div class="content-area">
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Lista de Colaboradores</h2>
                         <button onclick="showModal('modal-colaborador')" class="btn btn-success btn-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
                             Novo
                         </button>
                     </div>
                     <div class="card-body">
                         <div class="search-bar">
-                            <input type="text" id="search" class="search-input" placeholder="Buscar por nome ou matrícula...">
+                            <input type="text" id="search" class="search-input"
+                                placeholder="Buscar por nome ou matrícula...">
                             <button onclick="loadColaboradores()" class="btn btn-secondary">Buscar</button>
                         </div>
                         <div class="table-container">
@@ -130,14 +189,17 @@
             </div>
         </main>
     </div>
-    
+
     <!-- Modal -->
     <div id="modal-colaborador" class="modal-overlay">
         <div class="modal modal-lg">
             <div class="modal-header">
                 <h2 class="modal-title" id="modal-title">Novo Colaborador</h2>
                 <button onclick="hideModal('modal-colaborador')" class="modal-close">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
             <div class="modal-body">
@@ -202,7 +264,8 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">EPIs Obrigatórios</label>
-                        <input type="text" id="colab-epis" class="form-input" placeholder="Ex: Luvas, Óculos, Protetor auricular">
+                        <input type="text" id="colab-epis" class="form-input"
+                            placeholder="Ex: Luvas, Óculos, Protetor auricular">
                     </div>
                     <div class="border-t border-slate-200 pt-4 mt-4">
                         <h3 class="font-semibold text-slate-800 mb-4">Contato de Emergência</h3>
@@ -224,18 +287,18 @@
             </div>
         </div>
     </div>
-    
+
     <script th:src="@{/js/app.js}"></script>
     <script>
         let collapsed = false;
-        
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('open');
             overlay.classList.toggle('hidden');
         }
-        
+
         function toggleCollapse() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.querySelector('.main-content');
@@ -248,10 +311,10 @@
                 mainContent.style.marginLeft = '280px';
             }
         }
-        
+
         function showModal(id) { document.getElementById(id).classList.add('active'); }
         function hideModal(id) { document.getElementById(id).classList.remove('active'); }
-        
+
         async function loadColaboradores() {
             const data = await Colaboradores.getAll();
             const tbody = document.getElementById('tabela-colaboradores');
@@ -271,7 +334,7 @@
                 </tr>`;
             });
         }
-        
+
         function editarColaborador(id) {
             Colaboradores.getById(id).then(c => {
                 document.getElementById('colab-id').value = c.id;
@@ -291,7 +354,7 @@
                 showModal('modal-colaborador');
             });
         }
-        
+
         document.getElementById('form-colaborador').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -324,7 +387,7 @@
                 console.error('Erro ao salvar:', err);
             }
         });
-        
+
         function logout() { localStorage.removeItem('token'); window.location.replace('/login'); }
         if (localStorage.getItem('token')) {
             loadColaboradores();
@@ -333,4 +396,5 @@
         }
     </script>
 </body>
+
 </html>

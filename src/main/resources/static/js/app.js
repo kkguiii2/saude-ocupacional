@@ -526,4 +526,17 @@ function checkAuth() {
 // Executa imediatamente ao carregar app.js (bloqueia render de páginas sem token)
 (function () {
     checkAuth();
-})();
+
+    // Exibe o botão/link "Usuários" na sidebar apenas para perfil ADMINISTRADOR
+    try {
+        var t = localStorage.getItem('token');
+        if (t) {
+            var payload = JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+            var role = payload.role || payload.perfil || '';
+            if (role === 'ADMINISTRADOR') {
+                var btn = document.getElementById('btn-usuarios');
+                if (btn) btn.style.display = '';
+            }
+        }
+    } catch (e) { /* token inválido */ }
+})();

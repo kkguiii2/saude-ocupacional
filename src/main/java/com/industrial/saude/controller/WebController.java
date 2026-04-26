@@ -51,4 +51,9 @@ public class WebController {
     public String relatorios() {
         return "relatorios";
     }
-}
+
+    @GetMapping("/usuarios")
+    public String usuarios() {
+        return "usuarios";
+    }
+}

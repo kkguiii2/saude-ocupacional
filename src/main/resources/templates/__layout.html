@@ -119,6 +119,13 @@
                         </svg>
                         <span class="whitespace-nowrap">Relatórios</span>
                     </a>
+                    <!-- Botão Usuários: visível apenas para ADMINISTRADOR (controlado por JS) -->
+                    <a id="btn-usuarios" href="/usuarios" th:class="${activePage == 'usuarios'} ? 'sidebar-nav-link active' : 'sidebar-nav-link'" style="display:none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span class="whitespace-nowrap">Usuários</span>
+                    </a>
                 </div>
             </nav>
             
@@ -213,6 +220,21 @@
         if (!localStorage.getItem('token') && window.location.pathname !== '/login') {
             window.location.href = '/login';
         }
+
+        // Exibe o botão de Usuários apenas para o perfil ADMINISTRADOR
+        (function() {
+            try {
+                var token = localStorage.getItem('token');
+                if (!token) return;
+                // Decodifica o payload do JWT (base64)
+                var payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+                var role = payload.role || payload.perfil || '';
+                if (role === 'ADMINISTRADOR') {
+                    var btn = document.getElementById('btn-usuarios');
+                    if (btn) btn.style.display = '';
+                }
+            } catch(e) { /* token inválido ou ausente */ }
+        })();
     </script>
 </body>
 </html>
