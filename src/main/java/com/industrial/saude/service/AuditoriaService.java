@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Slf4j
 @Service
@@ -32,7 +37,6 @@ public class AuditoriaService {
     public static final String ACAO_ENTRADA = "ENTRADA";
     public static final String ACAO_SAIDA = "SAIDA";
 
-    @Async
     @Transactional
     public void registrar(String username, String acao, String modulo, String descricao) {
         try {
@@ -41,6 +45,13 @@ public class AuditoriaService {
             auditoria.setModulo(modulo);
             auditoria.setDescricao(descricao);
             auditoria.setDataHora(LocalDateTime.now());
+            
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null && attrs.getRequest() != null) {
+                HttpServletRequest request = attrs.getRequest();
+                auditoria.setIp(request.getRemoteAddr());
+                auditoria.setUserAgent(request.getHeader("User-Agent"));
+            }
 
             Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
             usuario.ifPresent(auditoria::setUsuario);
@@ -52,7 +63,6 @@ public class AuditoriaService {
         }
     }
 
-    @Async
     @Transactional
     public void registrar(String username, String acao, String modulo, String descricao, String detalhes) {
         try {
@@ -62,6 +72,13 @@ public class AuditoriaService {
             auditoria.setDescricao(descricao);
             auditoria.setDetalhes(detalhes);
             auditoria.setDataHora(LocalDateTime.now());
+
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null && attrs.getRequest() != null) {
+                HttpServletRequest request = attrs.getRequest();
+                auditoria.setIp(request.getRemoteAddr());
+                auditoria.setUserAgent(request.getHeader("User-Agent"));
+            }
 
             Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
             usuario.ifPresent(auditoria::setUsuario);
@@ -80,6 +97,13 @@ public class AuditoriaService {
             auditoria.setModulo("AUTH");
             auditoria.setDescricao(sucesso ? "Login realizado com sucesso" : "Falha no login");
             auditoria.setDataHora(LocalDateTime.now());
+
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null && attrs.getRequest() != null) {
+                HttpServletRequest request = attrs.getRequest();
+                auditoria.setIp(request.getRemoteAddr());
+                auditoria.setUserAgent(request.getHeader("User-Agent"));
+            }
 
             if (sucesso) {
                 Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
@@ -100,6 +124,13 @@ public class AuditoriaService {
             auditoria.setModulo("AUTH");
             auditoria.setDescricao("Logout realizado");
             auditoria.setDataHora(LocalDateTime.now());
+
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null && attrs.getRequest() != null) {
+                HttpServletRequest request = attrs.getRequest();
+                auditoria.setIp(request.getRemoteAddr());
+                auditoria.setUserAgent(request.getHeader("User-Agent"));
+            }
 
             Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
             usuario.ifPresent(auditoria::setUsuario);

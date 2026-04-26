@@ -24,4 +24,5 @@ public class AtendimentoDTO {
     private String conduta;
     private Atendimento.Encaminhamento encaminhamento;
     private boolean emergencia;
+    private java.util.List<AtendimentoMedicamentoDTO> medicamentos = new java.util.ArrayList<>();
 }

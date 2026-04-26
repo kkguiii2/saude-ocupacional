@@ -28,4 +28,10 @@ public class AcidenteTrabalhoDTO {
     private String testemunhas;
     private boolean catEmitida;
     private String numeroCat;
+    private String dataCat;
+    private String cnpjEmpresa;
+    private String cid;
+    private String parteCorpoAtingida;
+    private Integer diasAfastados;
+    private boolean prazoCatVencido;
 }

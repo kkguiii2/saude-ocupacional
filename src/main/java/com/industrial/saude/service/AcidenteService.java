@@ -78,6 +78,13 @@ public class AcidenteService {
         entity.setTestemunhas(dto.getTestemunhas());
         entity.setCatEmitida(dto.isCatEmitida());
         entity.setNumeroCat(dto.getNumeroCat());
+        if (dto.getDataCat() != null && !dto.getDataCat().isEmpty()) {
+            entity.setDataCat(LocalDateTime.parse(dto.getDataCat()));
+        }
+        entity.setCnpjEmpresa("12.345.678/0001-95");
+        entity.setCid(dto.getCid());
+        entity.setParteCorpoAtingida(dto.getParteCorpoAtingida());
+        entity.setDiasAfastados(dto.getDiasAfastados());
         entity.setDataCadastro(LocalDateTime.now());
         
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
@@ -105,6 +112,13 @@ public class AcidenteService {
         entity.setTestemunhas(dto.getTestemunhas());
         entity.setCatEmitida(dto.isCatEmitida());
         entity.setNumeroCat(dto.getNumeroCat());
+        if (dto.getDataCat() != null && !dto.getDataCat().isEmpty()) {
+            entity.setDataCat(LocalDateTime.parse(dto.getDataCat()));
+        }
+        entity.setCnpjEmpresa("12.345.678/0001-95");
+        entity.setCid(dto.getCid());
+        entity.setParteCorpoAtingida(dto.getParteCorpoAtingida());
+        entity.setDiasAfastados(dto.getDiasAfastados());
 
         repository.save(entity);
 
@@ -116,17 +130,67 @@ public class AcidenteService {
     }
 
     @Transactional
-    public void emitirCat(Long id) {
+    public byte[] emitirCat(Long id) {
         AcidenteTrabalho entity = repository.findById(id).orElse(null);
-        if (entity == null) return;
+        if (entity == null) return null;
 
-        entity.setCatEmitida(true);
-        entity.setNumeroCat("CAT-" + System.currentTimeMillis());
-        repository.save(entity);
+        if (!entity.isCatEmitida()) {
+            entity.setCatEmitida(true);
+            entity.setNumeroCat("CAT-" + System.currentTimeMillis());
+            entity.setDataCat(LocalDateTime.now());
+            repository.save(entity);
 
-        String username = entity.getRegistradoPor() != null ? entity.getRegistradoPor().getUsername() : "sistema";
-        auditoriaService.registrar(username, AuditoriaService.ACAO_UPDATE, "ACIDENTE",
-                "CAT emitida ID: " + id + " - " + entity.getNumeroCat());
+            String username = entity.getRegistradoPor() != null ? entity.getRegistradoPor().getUsername() : "sistema";
+            auditoriaService.registrar(username, AuditoriaService.ACAO_UPDATE, "ACIDENTE",
+                    "CAT emitida ID: " + id + " - " + entity.getNumeroCat());
+        }
+
+        return gerarPdfCat(entity);
+    }
+
+    private byte[] gerarPdfCat(AcidenteTrabalho entity) {
+        try (java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+            com.lowagie.text.Document document = new com.lowagie.text.Document();
+            com.lowagie.text.pdf.PdfWriter.getInstance(document, out);
+            document.open();
+            
+            com.lowagie.text.Font titleFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 18, com.lowagie.text.Font.BOLD);
+            com.lowagie.text.Font labelFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 12, com.lowagie.text.Font.BOLD);
+            com.lowagie.text.Font dataFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 12, com.lowagie.text.Font.NORMAL);
+            
+            com.lowagie.text.Paragraph title = new com.lowagie.text.Paragraph("COMUNICAÇÃO DE ACIDENTE DE TRABALHO - CAT", titleFont);
+            title.setAlignment(com.lowagie.text.Element.ALIGN_CENTER);
+            title.setSpacingAfter(20);
+            document.add(title);
+            
+            document.add(new com.lowagie.text.Paragraph("Número da CAT: " + entity.getNumeroCat(), labelFont));
+            document.add(new com.lowagie.text.Paragraph("Data Emissão: " + (entity.getDataCat() != null ? entity.getDataCat().toString() : ""), dataFont));
+            document.add(new com.lowagie.text.Paragraph("CNPJ Empresa: 12.345.678/0001-95", dataFont));
+            document.add(new com.lowagie.text.Paragraph("\n"));
+            
+            document.add(new com.lowagie.text.Paragraph("DADOS DO ACIDENTADO", labelFont));
+            document.add(new com.lowagie.text.Paragraph("Nome: " + entity.getColaborador().getNomeCompleto(), dataFont));
+            document.add(new com.lowagie.text.Paragraph("Matrícula: " + entity.getColaborador().getMatricula(), dataFont));
+            document.add(new com.lowagie.text.Paragraph("Setor: " + entity.getColaborador().getSetor(), dataFont));
+            document.add(new com.lowagie.text.Paragraph("PIS/PASEP: " + (entity.getColaborador().getPisPasep() != null ? entity.getColaborador().getPisPasep() : ""), dataFont));
+            document.add(new com.lowagie.text.Paragraph("\n"));
+            
+            document.add(new com.lowagie.text.Paragraph("DADOS DO ACIDENTE", labelFont));
+            document.add(new com.lowagie.text.Paragraph("Data/Hora: " + entity.getDataHora().toString(), dataFont));
+            document.add(new com.lowagie.text.Paragraph("Local: " + entity.getLocalFabrica(), dataFont));
+            document.add(new com.lowagie.text.Paragraph("Tipo: " + entity.getTipo(), dataFont));
+            document.add(new com.lowagie.text.Paragraph("Parte do Corpo Atingida: " + (entity.getParteCorpoAtingida() != null ? entity.getParteCorpoAtingida() : ""), dataFont));
+            document.add(new com.lowagie.text.Paragraph("CID: " + (entity.getCid() != null ? entity.getCid() : ""), dataFont));
+            document.add(new com.lowagie.text.Paragraph("Dias Afastados: " + (entity.getDiasAfastados() != null ? entity.getDiasAfastados() : "0"), dataFont));
+            document.add(new com.lowagie.text.Paragraph("\n"));
+            
+            document.add(new com.lowagie.text.Paragraph("Descrição: " + entity.getDescricao(), dataFont));
+            
+            document.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar PDF da CAT", e);
+        }
     }
     
     public long countMes() {
@@ -151,6 +215,12 @@ public class AcidenteService {
         dto.setTestemunhas(entity.getTestemunhas());
         dto.setCatEmitida(entity.isCatEmitida());
         dto.setNumeroCat(entity.getNumeroCat());
+        dto.setDataCat(entity.getDataCat() != null ? entity.getDataCat().toString() : null);
+        dto.setCnpjEmpresa(entity.getCnpjEmpresa());
+        dto.setCid(entity.getCid());
+        dto.setParteCorpoAtingida(entity.getParteCorpoAtingida());
+        dto.setDiasAfastados(entity.getDiasAfastados());
+        dto.setPrazoCatVencido(entity.isPrazoCatVencido());
         return dto;
     }
 }

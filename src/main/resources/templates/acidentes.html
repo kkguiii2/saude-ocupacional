@@ -130,7 +130,14 @@
                         </select>
                     </div>
                     <div class="form-group"><label class="form-label">Descrição</label><textarea id="acid-desc" rows="3" class="form-input"></textarea></div>
-                    <div class="form-group"><label class="form-label">Causa</label><input type="text" id="acid-causa" class="form-input"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group"><label class="form-label">CID</label><input type="text" id="acid-cid" class="form-input" placeholder="Ex: S61.0"></div>
+                        <div class="form-group"><label class="form-label">Parte Atingida</label><input type="text" id="acid-parte" class="form-input" placeholder="Ex: Dedo indicador"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group"><label class="form-label">Causa</label><input type="text" id="acid-causa" class="form-input"></div>
+                        <div class="form-group"><label class="form-label">Dias Afastados</label><input type="number" id="acid-dias" class="form-input" min="0" placeholder="Ex: 5" value="0"></div>
+                    </div>
                     <div class="form-group"><label class="form-label">Medidas Tomadas</label><textarea id="acid-medidas" rows="2" class="form-input"></textarea></div>
                     <div class="form-group"><label class="form-label">Testemunhas</label><input type="text" id="acid-testemunhas" class="form-input"></div>
                     <div class="pt-4"><button type="submit" class="btn btn-primary btn-block">Registrar</button></div>
@@ -193,7 +200,10 @@
                     localFabrica: document.getElementById('acid-localFabrica').value,
                     tipo: document.getElementById('acid-tipo').value,
                     descricao: document.getElementById('acid-desc').value,
+                    cid: document.getElementById('acid-cid').value,
+                    parteCorpoAtingida: document.getElementById('acid-parte').value,
                     causa: document.getElementById('acid-causa').value,
+                    diasAfastados: document.getElementById('acid-dias').value ? parseInt(document.getElementById('acid-dias').value) : 0,
                     medidasTomadas: document.getElementById('acid-medidas').value,
                     testemunhas: document.getElementById('acid-testemunhas').value
                 };

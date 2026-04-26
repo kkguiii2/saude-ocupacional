@@ -3,7 +3,10 @@ package com.industrial.saude.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import org.hibernate.envers.Audited;
+
 @Entity
+@Audited
 @Table(name = "prontuarios_ocupacionais", indexes = {
     @Index(name = "idx_prontuario_colaborador", columnList = "colaborador_id", unique = true)
 })
@@ -11,6 +14,7 @@ public class ProntuarioOcupacional extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "colaborador_id", nullable = false, unique = true)
+    @org.hibernate.envers.Audited(targetAuditMode = org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED)
     private Colaborador colaborador;
 
     @Column(name = "historico_doencas", columnDefinition = "TEXT")

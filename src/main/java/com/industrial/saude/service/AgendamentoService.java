@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +26,8 @@ public class AgendamentoService {
     private final UsuarioRepository usuarioRepository;
     private final AuditoriaService auditoriaService;
 
-    public List<AgendamentoDTO> findAll() {
-        return repository.findAll().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Page<AgendamentoDTO> findAll(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
     }
 
     public List<AgendamentoDTO> findPendentes() {

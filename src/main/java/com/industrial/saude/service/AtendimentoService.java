@@ -7,6 +7,10 @@ import com.industrial.saude.model.Usuario;
 import com.industrial.saude.repository.AtendimentoRepository;
 import com.industrial.saude.repository.ColaboradorRepository;
 import com.industrial.saude.repository.UsuarioRepository;
+import com.industrial.saude.repository.MedicamentoRepository;
+import com.industrial.saude.model.AtendimentoMedicamento;
+import com.industrial.saude.model.Medicamento;
+import com.industrial.saude.dto.AtendimentoMedicamentoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,8 @@ public class AtendimentoService {
     private final AtendimentoRepository repository;
     private final ColaboradorRepository colaboradorRepository;
     private final UsuarioRepository usuarioRepository;
+    private final MedicamentoRepository medicamentoRepository;
+    private final EstoqueService estoqueService;
     private final AuditoriaService auditoriaService;
     
     public List<AtendimentoDTO> findAll() {
@@ -91,8 +97,22 @@ public class AtendimentoService {
         entity.setEmergencia(dto.isEmergencia());
         
         entity = repository.save(entity);
-
         String username = atendente.getUsername();
+
+        if (dto.getMedicamentos() != null && !dto.getMedicamentos().isEmpty()) {
+            for (AtendimentoMedicamentoDTO medDto : dto.getMedicamentos()) {
+                Medicamento med = medicamentoRepository.findById(medDto.getMedicamentoId())
+                        .orElseThrow(() -> new RuntimeException("Medicamento não encontrado"));
+                AtendimentoMedicamento am = new AtendimentoMedicamento();
+                am.setMedicamento(med);
+                am.setQuantidade(medDto.getQuantidade());
+                entity.addMedicamento(am);
+                // Deduct from stock
+                estoqueService.saida(med.getId(), medDto.getQuantidade(), atendenteId);
+            }
+            entity = repository.save(entity);
+        }
+
         auditoriaService.registrar(username, AuditoriaService.ACAO_CREATE, "ATENDAMENTO",
                 "Atendimento criado para: " + entity.getColaborador().getNomeCompleto());
 
@@ -144,6 +164,20 @@ public class AtendimentoService {
         dto.setConduta(entity.getConduta());
         dto.setEncaminhamento(entity.getEncaminhamento());
         dto.setEmergencia(entity.isEmergencia());
+        
+        if (entity.getMedicamentosDispensados() != null) {
+            java.util.List<AtendimentoMedicamentoDTO> meds = new java.util.ArrayList<>();
+            for (AtendimentoMedicamento am : entity.getMedicamentosDispensados()) {
+                AtendimentoMedicamentoDTO md = new AtendimentoMedicamentoDTO();
+                md.setId(am.getId());
+                md.setMedicamentoId(am.getMedicamento().getId());
+                md.setMedicamentoNome(am.getMedicamento().getNome());
+                md.setQuantidade(am.getQuantidade());
+                meds.add(md);
+            }
+            dto.setMedicamentos(meds);
+        }
+        
         return dto;
     }
 }

@@ -45,6 +45,9 @@ public class Atendimento extends BaseEntity {
     @Column(name = "emergencia", nullable = false)
     private boolean emergencia;
 
+    @OneToMany(mappedBy = "atendimento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<AtendimentoMedicamento> medicamentosDispensados = new java.util.ArrayList<>();
+
     public enum TipoAtendimento {
         CONSULTA_ROTINA, EMERGENCIA, ACIDENTE_TRABALHO, RETORNO_TRABALHO, EXAME_PERIODICO, AVALIACAO_CLINICA
     }
@@ -127,5 +130,18 @@ public class Atendimento extends BaseEntity {
 
     public void setEmergencia(boolean emergencia) {
         this.emergencia = emergencia;
+    }
+
+    public java.util.List<AtendimentoMedicamento> getMedicamentosDispensados() {
+        return medicamentosDispensados;
+    }
+
+    public void setMedicamentosDispensados(java.util.List<AtendimentoMedicamento> medicamentosDispensados) {
+        this.medicamentosDispensados = medicamentosDispensados;
+    }
+
+    public void addMedicamento(AtendimentoMedicamento am) {
+        medicamentosDispensados.add(am);
+        am.setAtendimento(this);
     }
 }

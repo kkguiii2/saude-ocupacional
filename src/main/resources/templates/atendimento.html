@@ -166,6 +166,17 @@
                             <option value="ACOMPANHAMENTO_AMBULATORIO">Acomp. Ambulatório</option>
                         </select>
                     </div>
+                    <div class="form-group border-t border-slate-200 pt-4 mt-4">
+                        <label class="form-label font-semibold text-slate-800 mb-3">Medicamentos Dispensados</label>
+                        <div id="medicamentos-container" class="space-y-2 mb-3 max-h-32 overflow-y-auto"></div>
+                        <div class="flex gap-2">
+                            <select id="select-medicamento" class="form-input flex-1">
+                                <option value="">Selecione um medicamento...</option>
+                            </select>
+                            <input type="number" id="input-qtd-medicamento" class="form-input w-24" placeholder="Qtd" min="1" value="1">
+                            <button type="button" onclick="adicionarMedicamento()" class="btn btn-secondary">Adicionar</button>
+                        </div>
+                    </div>
                     <div class="pt-4"><button type="submit" id="btn-registrar-atendimento" class="btn btn-primary btn-block">Registrar</button></div>
                 </form>
             </div>
@@ -179,6 +190,63 @@
         function toggleCollapse() { const sidebar = document.getElementById('sidebar'); const mainContent = document.querySelector('.main-content'); collapsed = !collapsed; sidebar.classList.toggle('collapsed'); mainContent.style.marginLeft = collapsed ? '80px' : '280px'; }
         function showModal(id) { document.getElementById(id).classList.add('active'); }
         function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        let medicamentosDispensados = [];
+        let listaMedicamentos = [];
+        
+        async function loadMedicamentos() {
+            try {
+                listaMedicamentos = await Estoque.getAll();
+                const select = document.getElementById('select-medicamento');
+                listaMedicamentos.forEach(m => {
+                    if(m.ativo) select.innerHTML += `<option value="${m.id}">${m.nome} (Estoque: ${m.quantidadeEstoque})</option>`;
+                });
+            } catch(e) { console.error('Erro ao carregar medicamentos', e); }
+        }
+
+        function adicionarMedicamento() {
+            const select = document.getElementById('select-medicamento');
+            const qtdInput = document.getElementById('input-qtd-medicamento');
+            const medId = parseInt(select.value);
+            const qtd = parseInt(qtdInput.value);
+            
+            if(!medId || isNaN(qtd) || qtd <= 0) return;
+            
+            const med = listaMedicamentos.find(m => m.id === medId);
+            if(!med) return;
+            
+            // Check if already added
+            const existing = medicamentosDispensados.find(m => m.medicamentoId === medId);
+            if(existing) {
+                existing.quantidade += qtd;
+            } else {
+                medicamentosDispensados.push({ medicamentoId: medId, medicamentoNome: med.nome, quantidade: qtd });
+            }
+            
+            atualizarListaMedicamentos();
+            select.value = '';
+            qtdInput.value = '1';
+        }
+
+        function removerMedicamento(id) {
+            medicamentosDispensados = medicamentosDispensados.filter(m => m.medicamentoId !== id);
+            atualizarListaMedicamentos();
+        }
+
+        function atualizarListaMedicamentos() {
+            const container = document.getElementById('medicamentos-container');
+            container.innerHTML = medicamentosDispensados.map(m => `
+                <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-200">
+                    <span class="text-sm text-slate-700">${m.medicamentoNome}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium">${m.quantidade} un.</span>
+                        <button type="button" onclick="removerMedicamento(${m.medicamentoId})" class="text-red-500 hover:text-red-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
         
         async function loadAtendimentos() {
             try {
@@ -247,7 +315,8 @@
                     gravidade: document.getElementById('atend-gravidade').value,
                     conduta: document.getElementById('atend-conduta').value,
                     encaminhamento: encaminhamentoVal || null,
-                    emergencia: document.getElementById('atend-tipo').value === 'EMERGENCIA'
+                    emergencia: document.getElementById('atend-tipo').value === 'EMERGENCIA',
+                    medicamentos: medicamentosDispensados
                 };
                 console.log('Salvando atendimento:', data);
                 const resultado = await Atendimentos.save(data);
@@ -258,6 +327,8 @@
                 showMessage('Atendimento registrado com sucesso!', 'success');
                 hideModal('modal-atendimento');
                 document.getElementById('form-atendimento').reset();
+                medicamentosDispensados = [];
+                atualizarListaMedicamentos();
                 // Aguarda ambas as atualizações antes de continuar
                 await Promise.all([loadAtendimentos(), loadEmergencias()]);
             } catch (err) {
@@ -273,6 +344,7 @@
         if (localStorage.getItem('token')) {
             loadAtendimentos();
             loadEmergencias();
+            loadMedicamentos();
         } else {
             window.location.replace('/login');
         }

@@ -47,6 +47,15 @@ public class Colaborador extends BaseEntity {
     @Column(name = "data_admissao")
     private LocalDate dataAdmissao;
 
+    @Column(name = "data_nascimento")
+    private LocalDate dataNascimento;
+
+    @Column(name = "telefone")
+    private String telefone;
+
+    @Column(name = "pis_pasep")
+    private String pisPasep;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status_funcionario")
     private StatusFuncionario statusFuncionario = StatusFuncionario.ATIVO;
@@ -155,6 +164,30 @@ public class Colaborador extends BaseEntity {
         this.dataAdmissao = dataAdmissao;
     }
 
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getPisPasep() {
+        return pisPasep;
+    }
+
+    public void setPisPasep(String pisPasep) {
+        this.pisPasep = pisPasep;
+    }
+
     public StatusFuncionario getStatusFuncionario() {
         return statusFuncionario;
     }
@@ -208,5 +241,15 @@ public class Colaborador extends BaseEntity {
     public void addAcidente(AcidenteTrabalho acidente) {
         acidentes.add(acidente);
         acidente.setColaborador(this);
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void syncStatus() {
+        if (this.statusFuncionario == StatusFuncionario.DEMITIDO) {
+            this.setAtivo(false);
+        } else if (this.statusFuncionario == StatusFuncionario.ATIVO) {
+            this.setAtivo(true);
+        }
     }
 }

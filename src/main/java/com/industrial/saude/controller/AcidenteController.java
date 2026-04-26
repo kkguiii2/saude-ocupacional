@@ -53,8 +53,17 @@ public class AcidenteController {
     }
     
     @PostMapping("/{id}/cat")
-    public ResponseEntity<Void> emitirCat(@PathVariable Long id) {
-        service.emitirCat(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<byte[]> emitirCat(@PathVariable Long id) {
+        byte[] pdf = service.emitirCat(id);
+        if (pdf == null) {
+            return ResponseEntity.notFound().build();
+        }
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("filename", "CAT-" + id + ".pdf");
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdf);
     }
 }

@@ -186,4 +186,24 @@ public class RelatorioController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/nr7/excel")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<byte[]> gerarExcelNR7(
+            @AuthenticationPrincipal Usuario usuario) {
+        try {
+            byte[] excel = relatorioService.gerarExcelNR7();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "relatorio_pcmso_nr7.xlsx");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(excel);
+        } catch (Exception e) {
+            log.error("Erro ao gerar Excel NR-7: {}", e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

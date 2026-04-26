@@ -47,6 +47,18 @@ public class AcidenteTrabalho extends BaseEntity {
     @Column(name = "data_cat")
     private LocalDateTime dataCat;
 
+    @Column(name = "cnpj_empresa")
+    private String cnpjEmpresa;
+
+    @Column(name = "cid")
+    private String cid;
+
+    @Column(name = "parte_corpo_atingida")
+    private String parteCorpoAtingida;
+
+    @Column(name = "dias_afastados")
+    private Integer diasAfastados;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "registrado_por")
     private Usuario registradoPor;
@@ -141,6 +153,24 @@ public class AcidenteTrabalho extends BaseEntity {
 
     public void setDataCat(LocalDateTime dataCat) {
         this.dataCat = dataCat;
+    }
+
+    public String getCnpjEmpresa() { return cnpjEmpresa; }
+    public void setCnpjEmpresa(String cnpjEmpresa) { this.cnpjEmpresa = cnpjEmpresa; }
+
+    public String getCid() { return cid; }
+    public void setCid(String cid) { this.cid = cid; }
+
+    public String getParteCorpoAtingida() { return parteCorpoAtingida; }
+    public void setParteCorpoAtingida(String parteCorpoAtingida) { this.parteCorpoAtingida = parteCorpoAtingida; }
+
+    public Integer getDiasAfastados() { return diasAfastados; }
+    public void setDiasAfastados(Integer diasAfastados) { this.diasAfastados = diasAfastados; }
+
+    public boolean isPrazoCatVencido() {
+        if (catEmitida || dataHora == null) return false;
+        // 1 business day simplification (24 hours)
+        return LocalDateTime.now().isAfter(dataHora.plusHours(24));
     }
 
     public Usuario getRegistradoPor() {

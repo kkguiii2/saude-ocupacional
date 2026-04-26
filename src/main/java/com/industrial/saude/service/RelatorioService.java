@@ -569,6 +569,53 @@ public class RelatorioService {
         return baos.toByteArray();
     }
 
+    public byte[] gerarExcelNR7() {
+        List<Colaborador> colaboradores = colaboradorRepository.findByAtivoTrue();
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Relatório PCMSO (NR-7 e eSocial)");
+        String[] headers = {
+            "ID", "Nome do Colaborador", "Matrícula", "PIS/PASEP", "Setor", "Cargo",
+            "Data Admissão", "Risco Ocupacional", "Último Exame (ASO)", "Próximo Exame",
+            "Restrições", "Observações Médicas"
+        };
+        ExcelStyles s = createExcelHeader(workbook, sheet, headers);
+
+        int rowNum = 1;
+        for (Colaborador colab : colaboradores) {
+            Row row = sheet.createRow(rowNum);
+            styledNumericCell(row, 0, colab.getId(), s, rowNum);
+            styledCell(row, 1, colab.getNomeCompleto(), s, rowNum);
+            styledCell(row, 2, colab.getMatricula(), s, rowNum);
+            styledCell(row, 3, colab.getPisPasep() != null ? colab.getPisPasep() : "", s, rowNum);
+            styledCell(row, 4, colab.getSetor() != null ? colab.getSetor().name() : "", s, rowNum);
+            styledCell(row, 5, colab.getCargo(), s, rowNum);
+            styledCell(row, 6, colab.getDataAdmissao() != null ? colab.getDataAdmissao().toString() : "", s, rowNum);
+            styledCell(row, 7, colab.getTipoRisco() != null ? colab.getTipoRisco().name() : "", s, rowNum);
+            
+            ProntuarioOcupacional p = colab.getProntuario();
+            if (p != null) {
+                styledCell(row, 8, p.getUltimoExame() != null ? p.getUltimoExame().format(DATE_FORMATTER) : "", s, rowNum);
+                styledCell(row, 9, p.getProximoExame() != null ? p.getProximoExame().format(DATE_FORMATTER) : "", s, rowNum);
+                styledCell(row, 10, p.getRestricoesTrabalho() != null ? p.getRestricoesTrabalho() : "", s, rowNum);
+                String obs = "";
+                if (p.getAlergias() != null) obs += "Alergias: " + p.getAlergias() + " ";
+                if (p.getMedicacoesUso() != null) obs += "Med: " + p.getMedicacoesUso();
+                styledCell(row, 11, obs.trim(), s, rowNum);
+            } else {
+                styledCell(row, 8, "", s, rowNum);
+                styledCell(row, 9, "", s, rowNum);
+                styledCell(row, 10, "", s, rowNum);
+                styledCell(row, 11, "Sem Prontuário", s, rowNum);
+            }
+            rowNum++;
+        }
+        for (int i = 0; i < headers.length; i++) sheet.autoSizeColumn(i);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try { workbook.write(baos); workbook.close(); } catch (IOException e) { log.error("Erro ao gerar Excel NR-7: {}", e.getMessage()); }
+        return baos.toByteArray();
+    }
+
     // ─── Inner class that holds the three cell styles for one workbook ────────
     private static class ExcelStyles {
         final XSSFCellStyle header;

@@ -42,21 +42,44 @@ public class NotificationService {
     public void verificarEEnviarAlerta() {
         try {
             List<Medicamento> itensBaixo = medicamentoRepository.findEstoqueBaixo();
-
-            List<EstoqueBaixoItem> notificacoes = itensBaixo.stream()
+            List<EstoqueBaixoItem> notificacoesBaixo = itensBaixo.stream()
                     .map(EstoqueBaixoItem::fromMedicamento)
                     .collect(Collectors.toList());
 
-            ultimaNotificacao = notificacoes;
+            ultimaNotificacao = notificacoesBaixo;
             ultimoAlerta = LocalDateTime.now();
 
-            if (!notificacoes.isEmpty()) {
-                String msg = String.format("ALERTA: %d item(s) com estoque baixo!", notificacoes.size());
+            if (!notificacoesBaixo.isEmpty()) {
+                String msg = String.format("ALERTA: %d item(s) com estoque baixo!", notificacoesBaixo.size());
                 log.info("[Notification] {}", msg);
-                notificarClientes(notificacoes);
+                notificarClientes(notificacoesBaixo, "ESTOQUE_BAIXO");
             }
+
+            LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
+            List<Medicamento> itensVencendo = medicamentoRepository.findPrestesAVencer(dataLimite);
+            if (!itensVencendo.isEmpty()) {
+                List<EstoqueVencimentoItem> notificacoesVencendo = itensVencendo.stream()
+                        .map(EstoqueVencimentoItem::fromMedicamento)
+                        .collect(Collectors.toList());
+                
+                String msg = String.format("ALERTA: %d item(s) prestes a vencer em 30 dias!", notificacoesVencendo.size());
+                log.info("[Notification] {}", msg);
+                notificarClientes(notificacoesVencendo, "VENCIMENTO_PROXIMO");
+            }
+            
+            List<Medicamento> itensVencidos = medicamentoRepository.findVencidos();
+            if (!itensVencidos.isEmpty()) {
+                List<EstoqueVencimentoItem> notificacoesVencidos = itensVencidos.stream()
+                        .map(EstoqueVencimentoItem::fromMedicamento)
+                        .collect(Collectors.toList());
+                
+                String msg = String.format("ALERTA: %d item(s) VENCIDOS!", notificacoesVencidos.size());
+                log.info("[Notification] {}", msg);
+                notificarClientes(notificacoesVencidos, "MEDICAMENTO_VENCIDO");
+            }
+            
         } catch (Exception e) {
-            log.error("[Notification] Erro ao verificar estoque: {}", e.getMessage(), e);
+            log.error("[Notification] Erro ao verificar estoque/vencimento: {}", e.getMessage(), e);
         }
     }
 
@@ -127,12 +150,12 @@ public class NotificationService {
         }
     }
 
-    private void notificarClientes(List<EstoqueBaixoItem> itens) {
+    private void notificarClientes(Object dados, String evento) {
         for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(SseEmitter.event()
-                        .name("ESTOQUE_BAIXO")
-                        .data(itens));
+                        .name(evento)
+                        .data(dados));
             } catch (Exception e) {
                 log.error("[Notification] Erro ao notificar cliente: {}", e.getMessage());
                 emitters.remove(emitter);
@@ -183,5 +206,39 @@ public class NotificationService {
         public void setQuantidadeMinima(Integer quantidadeMinima) { this.quantidadeMinima = quantidadeMinima; }
         public String getUnidade() { return unidade; }
         public void setUnidade(String unidade) { this.unidade = unidade; }
+    }
+
+    public static class EstoqueVencimentoItem {
+        private Long id;
+        private String nome;
+        private String lote;
+        private String dataValidade;
+
+        public EstoqueVencimentoItem() {}
+
+        public EstoqueVencimentoItem(Long id, String nome, String lote, String dataValidade) {
+            this.id = id;
+            this.nome = nome != null ? nome : "";
+            this.lote = lote != null ? lote : "";
+            this.dataValidade = dataValidade != null ? dataValidade : "";
+        }
+
+        public static EstoqueVencimentoItem fromMedicamento(Medicamento m) {
+            return new EstoqueVencimentoItem(
+                    m.getId(),
+                    m.getNome(),
+                    m.getLote(),
+                    m.getDataValidade() != null ? m.getDataValidade().toString() : ""
+            );
+        }
+
+        public Long getId() { return id; }
+        public void setId(Long id) { this.id = id; }
+        public String getNome() { return nome; }
+        public void setNome(String nome) { this.nome = nome; }
+        public String getLote() { return lote; }
+        public void setLote(String lote) { this.lote = lote; }
+        public String getDataValidade() { return dataValidade; }
+        public void setDataValidade(String dataValidade) { this.dataValidade = dataValidade; }
     }
 }

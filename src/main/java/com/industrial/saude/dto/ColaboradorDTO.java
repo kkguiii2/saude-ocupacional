@@ -31,6 +31,9 @@ public class ColaboradorDTO {
     private String nomeContatoEmergencia;
     private String telefoneContato;
     private LocalDate dataAdmissao;
+    private LocalDate dataNascimento;
+    private String telefone;
+    private String pisPasep;
     private Colaborador.StatusFuncionario statusFuncionario;
     private boolean ativo;
     private LocalDateTime dataCadastro;

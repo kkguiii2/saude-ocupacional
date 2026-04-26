@@ -1,0 +1,3 @@
+ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS data_nascimento DATE;
+ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS telefone VARCHAR(255);
+ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS pis_pasep VARCHAR(255);

@@ -185,6 +185,20 @@
                             <label class="form-label">Data Admissão</label>
                             <input type="date" id="colab-admissao" class="form-input">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Nascimento</label>
+                            <input type="date" id="colab-nascimento" class="form-input">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Telefone Pessoal</label>
+                            <input type="text" id="colab-telefone" class="form-input" placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">PIS / PASEP</label>
+                            <input type="text" id="colab-pis" class="form-input" placeholder="000.00000.00-0">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">EPIs Obrigatórios</label>
@@ -269,6 +283,10 @@
                 document.getElementById('colab-epis').value = c.episObrigatorios || '';
                 document.getElementById('colab-contato-nome').value = c.nomeContatoEmergencia || '';
                 document.getElementById('colab-contato-tel').value = c.telefoneContato || '';
+                document.getElementById('colab-admissao').value = c.dataAdmissao || '';
+                document.getElementById('colab-nascimento').value = c.dataNascimento || '';
+                document.getElementById('colab-telefone').value = c.telefone || '';
+                document.getElementById('colab-pis').value = c.pisPasep || '';
                 document.getElementById('modal-title').textContent = 'Editar Colaborador';
                 showModal('modal-colaborador');
             });
@@ -291,7 +309,10 @@
                     episObrigatorios: document.getElementById('colab-epis').value,
                     nomeContatoEmergencia: document.getElementById('colab-contato-nome').value,
                     telefoneContato: document.getElementById('colab-contato-tel').value,
-                    dataAdmissao: document.getElementById('colab-admissao').value
+                    dataAdmissao: document.getElementById('colab-admissao').value,
+                    dataNascimento: document.getElementById('colab-nascimento').value,
+                    telefone: document.getElementById('colab-telefone').value,
+                    pisPasep: document.getElementById('colab-pis').value
                 };
                 if (id) { await Colaboradores.update(parseInt(id), data); }
                 else { await Colaboradores.save(data); }

@@ -12,5 +12,6 @@ public class AuditoriaDTO {
     private String descricao;
     private String detalhes;
     private String ip;
+    private String userAgent;
     private LocalDateTime dataHora;
 }

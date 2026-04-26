@@ -25,7 +25,7 @@ public class AuditoriaController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<ApiResponse<List<AuditoriaDTO>>> buscarTodos(
+    public ResponseEntity<ApiResponse<Page<AuditoriaDTO>>> buscarTodos(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false) String modulo,
@@ -39,24 +39,17 @@ public class AuditoriaController {
 
         if (modulo != null || usuarioId != null || acao != null || inicio != null || fim != null) {
             List<AuditoriaLog> filtered = service.buscarPorFiltros(modulo, usuarioId, acao, inicio, fim);
-            logs = filtered.stream()
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
-                        int start = (int) pageable.getOffset();
-                        int end = Math.min(start + pageable.getPageSize(), list.size());
-                        return list.subList(start, end).isEmpty() ? Page.empty() : Page.empty();
-                    }));
-            if (logs.isEmpty() && !filtered.isEmpty()) {
-                logs = Page.empty();
-            }
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), filtered.size());
+            List<AuditoriaLog> subList = start < filtered.size() ? filtered.subList(start, end) : List.of();
+            logs = new org.springframework.data.domain.PageImpl<>(subList, pageable, filtered.size());
         } else {
             logs = service.buscarTodos(pageable);
         }
 
-        List<AuditoriaDTO> dtos = logs.getContent().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        Page<AuditoriaDTO> dtos = logs.map(this::toDTO);
 
-        ApiResponse<List<AuditoriaDTO>> response = new ApiResponse<>();
+        ApiResponse<Page<AuditoriaDTO>> response = new ApiResponse<>();
         response.setData(dtos);
         response.setMessage("Logs de auditoria carregados");
         response.setSuccess(true);
@@ -106,6 +99,7 @@ public class AuditoriaController {
         dto.setDescricao(entity.getDescricao());
         dto.setDetalhes(entity.getDetalhes());
         dto.setIp(entity.getIp());
+        dto.setUserAgent(entity.getUserAgent());
         dto.setDataHora(entity.getDataHora());
 
         if (entity.getUsuario() != null) {

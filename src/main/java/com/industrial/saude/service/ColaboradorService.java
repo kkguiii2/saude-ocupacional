@@ -102,6 +102,9 @@ public class ColaboradorService {
         entity.setNomeContatoEmergencia(dto.getNomeContatoEmergencia());
         entity.setTelefoneContato(dto.getTelefoneContato());
         entity.setDataAdmissao(dto.getDataAdmissao());
+        entity.setDataNascimento(dto.getDataNascimento());
+        entity.setTelefone(dto.getTelefone());
+        entity.setPisPasep(dto.getPisPasep());
         entity.setStatusFuncionario(dto.getStatusFuncionario());
 
         auditoriaService.registrar(username, AuditoriaService.ACAO_UPDATE, "COLABORADOR",
@@ -150,6 +153,9 @@ public class ColaboradorService {
         dto.setNomeContatoEmergencia(entity.getNomeContatoEmergencia());
         dto.setTelefoneContato(entity.getTelefoneContato());
         dto.setDataAdmissao(entity.getDataAdmissao());
+        dto.setDataNascimento(entity.getDataNascimento());
+        dto.setTelefone(entity.getTelefone());
+        dto.setPisPasep(entity.getPisPasep());
         dto.setStatusFuncionario(entity.getStatusFuncionario());
         dto.setAtivo(entity.isAtivo());
         dto.setDataCadastro(entity.getDataCadastro());
@@ -169,6 +175,9 @@ public class ColaboradorService {
         entity.setNomeContatoEmergencia(dto.getNomeContatoEmergencia());
         entity.setTelefoneContato(dto.getTelefoneContato());
         entity.setDataAdmissao(dto.getDataAdmissao());
+        entity.setDataNascimento(dto.getDataNascimento());
+        entity.setTelefone(dto.getTelefone());
+        entity.setPisPasep(dto.getPisPasep());
         entity.setStatusFuncionario(dto.getStatusFuncionario() != null ? dto.getStatusFuncionario() : Colaborador.StatusFuncionario.ATIVO);
         return entity;
     }

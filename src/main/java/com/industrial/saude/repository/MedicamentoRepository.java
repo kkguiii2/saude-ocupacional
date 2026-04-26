@@ -15,4 +15,10 @@ public interface MedicamentoRepository extends JpaRepository<Medicamento, Long> 
     
     @Query("SELECT COUNT(m) FROM Medicamento m WHERE m.quantidadeEstoque <= m.quantidadeMinima")
     long countEstoqueBaixo();
+
+    @Query("SELECT m FROM Medicamento m WHERE m.ativo = true AND m.dataValidade IS NOT NULL AND m.dataValidade <= :dataLimite AND m.dataValidade > CURRENT_TIMESTAMP")
+    List<Medicamento> findPrestesAVencer(@Param("dataLimite") java.time.LocalDateTime dataLimite);
+    
+    @Query("SELECT m FROM Medicamento m WHERE m.ativo = true AND m.dataValidade IS NOT NULL AND m.dataValidade <= CURRENT_TIMESTAMP")
+    List<Medicamento> findVencidos();
 }
