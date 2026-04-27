@@ -61,7 +61,7 @@ public class ColaboradorController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('RH')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id, Authentication auth) {
         String username = auth.getName();
         service.delete(id, username);

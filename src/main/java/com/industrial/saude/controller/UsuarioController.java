@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,23 +26,23 @@ public class UsuarioController {
 
     /** GET /api/usuarios — lista todos os usuários (apenas ADMINISTRADOR) */
     @GetMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<UsuarioResponse>> listar(HttpServletRequest request) {
-        verificarAdmin(request);
         return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
     /** GET /api/usuarios/{id} — busca por ID (apenas ADMINISTRADOR) */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<UsuarioResponse> buscar(@PathVariable Long id, HttpServletRequest request) {
-        verificarAdmin(request);
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
     /** POST /api/usuarios — cria novo usuário (apenas ADMINISTRADOR) */
     @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<UsuarioResponse> criar(@Valid @RequestBody UsuarioRequest req,
-                                                  HttpServletRequest request) {
-        verificarAdmin(request);
+                                                   HttpServletRequest request) {
         String operador = extrairUsername(request);
         UsuarioResponse resp = usuarioService.criar(req, operador);
         log.info("Usuário criado via API: {} por {}", resp.getUsername(), operador);
@@ -50,30 +51,30 @@ public class UsuarioController {
 
     /** PUT /api/usuarios/{id} — atualiza usuário (apenas ADMINISTRADOR) */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<UsuarioResponse> atualizar(@PathVariable Long id,
-                                                      @Valid @RequestBody UsuarioRequest req,
-                                                      HttpServletRequest request) {
-        verificarAdmin(request);
+                                                       @Valid @RequestBody UsuarioRequest req,
+                                                       HttpServletRequest request) {
         String operador = extrairUsername(request);
         return ResponseEntity.ok(usuarioService.atualizar(id, req, operador));
     }
 
     /** PATCH /api/usuarios/{id}/status — ativa ou desativa (apenas ADMINISTRADOR) */
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<UsuarioResponse> alterarStatus(@PathVariable Long id,
-                                                          @RequestParam boolean ativo,
-                                                          HttpServletRequest request) {
-        verificarAdmin(request);
+                                                           @RequestParam boolean ativo,
+                                                           HttpServletRequest request) {
         String operador = extrairUsername(request);
         return ResponseEntity.ok(usuarioService.alterarStatus(id, ativo, operador));
     }
 
     /** PATCH /api/usuarios/{id}/senha — redefine senha (apenas ADMINISTRADOR) */
     @PatchMapping("/{id}/senha")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Map<String, String>> redefinirSenha(@PathVariable Long id,
-                                                               @RequestBody Map<String, String> body,
-                                                               HttpServletRequest request) {
-        verificarAdmin(request);
+                                                                @RequestBody Map<String, String> body,
+                                                                HttpServletRequest request) {
         String operador = extrairUsername(request);
         String novaSenha = body.get("novaSenha");
         usuarioService.redefinirSenha(id, novaSenha, operador);
@@ -94,16 +95,5 @@ public class UsuarioController {
         String token = extrairToken(request);
         if (token == null) return "desconhecido";
         return tokenProvider.getUsernameFromToken(token);
-    }
-
-    private void verificarAdmin(HttpServletRequest request) {
-        String token = extrairToken(request);
-        if (token == null || !tokenProvider.validateToken(token)) {
-            throw new SecurityException("Acesso não autorizado");
-        }
-        String perfil = tokenProvider.getRoleFromToken(token);
-        if (!"ADMINISTRADOR".equals(perfil)) {
-            throw new SecurityException("Apenas administradores podem gerenciar usuários");
-        }
     }
 }

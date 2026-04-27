@@ -6,6 +6,7 @@ import com.industrial.saude.service.AtendimentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -43,11 +44,13 @@ public class AtendimentoController {
     }
     
     @PostMapping
+    @PreAuthorize("hasAnyRole('SEGURANCA_TRABALHO', 'ENFERMEIRO')")
     public ResponseEntity<AtendimentoDTO> save(@Valid @RequestBody AtendimentoDTO dto, @AuthenticationPrincipal Usuario usuario) {
         return ResponseEntity.ok(service.save(dto, usuario.getId()));
     }
-    
+
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SEGURANCA_TRABALHO', 'ENFERMEIRO')")
     public ResponseEntity<AtendimentoDTO> update(@PathVariable Long id, @RequestBody AtendimentoDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
