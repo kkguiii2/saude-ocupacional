@@ -211,13 +211,14 @@ input, select, textarea {
 .overflow-y-auto { overflow-y: auto; }
 
 /* Responsive visibility */
-@media (max-width: 1024px) {
-    .lg\:hidden { display: none !important; }
-    .lg\:block { display: block !important; }
+/* lg:hidden = visible on mobile (<1024px), hidden on desktop (>=1024px) */
+@media (max-width: 1023px) {
+    .lg\:hidden { display: flex !important; }
+    .lg\:block  { display: none  !important; }
 }
 @media (min-width: 1024px) {
-    .lg\:hidden { display: flex; }
-    .lg\:block { display: none; }
+    .lg\:hidden { display: none  !important; }
+    .lg\:block  { display: block !important; }
 }
 
 /* Animate spin (used in login loading state) */
@@ -517,8 +518,20 @@ input, select, textarea {
     left: 0;
     height: 100vh;
     z-index: 50;
-    transition: var(--transition-slow);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Mobile: sidebar oculta fora da tela por padrão ---- */
+@media (max-width: 1023px) {
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: none;
+    }
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.35);
+    }
 }
 
 .sidebar.collapsed {
@@ -648,11 +661,18 @@ input, select, textarea {
     flex-direction: column;
     min-height: 100vh;
     overflow-y: auto;
-    transition: var(--transition-slow);
+    transition: margin-left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .sidebar.collapsed + .main-content {
     margin-left: 80px;
+}
+
+/* Mobile: conteúdo ocupa a tela toda (sidebar fica sobreposta) */
+@media (max-width: 1023px) {
+    .main-content {
+        margin-left: 0 !important;
+    }
 }
 
 /* ============================================ */
