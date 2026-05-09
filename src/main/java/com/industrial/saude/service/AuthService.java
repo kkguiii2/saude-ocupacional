@@ -7,6 +7,7 @@ import com.industrial.saude.repository.UsuarioRepository;
 import com.industrial.saude.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,9 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtTokenProvider tokenProvider;
     private final AuditoriaService auditoriaService;
+
+    @Value("${app.admin.password:Admin@Dev2026}")
+    private String adminPassword;
 
     private final Map<String, AttemptTracker> loginAttempts = new ConcurrentHashMap<>();
     private static final int MAX_ATTEMPTS = 5;
@@ -136,14 +140,20 @@ public class AuthService {
     @Transactional
     public void criarUsuarioAdmin() {
         if (!repository.existsByUsername("admin")) {
+            if (adminPassword == null || adminPassword.isBlank()) {
+                log.warn("ADMIN_PASSWORD não configurado — usando senha padrão de desenvolvimento!");
+                adminPassword = "Admin@Dev2026";
+            }
             Usuario admin = new Usuario();
             admin.setUsername("admin");
-            admin.setPassword(encoder.encode("Admin@2026"));
+            admin.setPassword(encoder.encode(adminPassword));
             admin.setNome("Administrador do Sistema");
             admin.setPerfil(Usuario.Perfil.ADMINISTRADOR);
             admin.setAtivo(true);
             repository.save(admin);
-            log.info("Usuário admin criado");
+            log.info("Usuário admin criado com sucesso");
+        } else {
+            log.debug("Usuário admin já existe, pulando criação");
         }
     }
 

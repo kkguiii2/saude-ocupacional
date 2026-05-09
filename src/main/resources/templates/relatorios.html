@@ -2,23 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatórios - Saúde Ocupacional</title>
     <link rel="stylesheet" th:href="@{/css/design-system.css}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        * { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Outfit', sans-serif; }
         body { opacity: 0; animation: pageFade 0.3s ease-out forwards; }
         @keyframes pageFade { from { opacity: 0; } to { opacity: 1; } }
         
@@ -52,6 +41,7 @@
                     <a href="/agendamentos" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="whitespace-nowrap">Agendamentos</span></a>
                     <a href="/estoque" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><span class="whitespace-nowrap">Estoque</span></a>
                     <a href="/relatorios" class="sidebar-nav-link active"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span class="whitespace-nowrap">Relatórios</span></a>
+                    <a id="btn-usuarios" href="/usuarios" class="sidebar-nav-link" style="display:none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span class="whitespace-nowrap">Usuários</span></a>
                 </div>
             </nav>
             <div class="sidebar-footer"><div class="sidebar-footer-text"></div></div>
@@ -65,129 +55,51 @@
                     <div><h1 class="text-lg font-semibold text-slate-800">Relatórios</h1><p class="text-sm text-slate-500">Exportação de dados do sistema</p></div>
                 </div>
                 <div class="app-header-right">
-                    <button onclick="logout()" class="header-icon-btn" title="Sair"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div id="header-user-name" class="user-name">Carregando...</div>
+                            <div id="header-user-role" class="user-role-badge"></div>
+                        </div>
+                        <div id="header-user-avatar" class="user-avatar"></div>
+                        <button onclick="logout()" class="header-icon-btn" title="Sair">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </header>
             
-            <div class="content-area">
-                <div class="card shadow-sm border border-slate-200">
-                    <div class="card-header bg-white border-b border-slate-100">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            </div>
-                            <div>
-                                <h2 class="card-title text-xl font-bold text-slate-800">Gerador de Relatórios (Excel)</h2>
-                            </div>
-                        </div>
-                    </div>
-                    
+                        <div class="content-area">
+                <div class="rpt-intro">
+                    <div class="rpt-intro-icon"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+                    <div><h2 class="rpt-intro-title">Gerador de relatórios Excel</h2><p class="rpt-intro-desc">Selecione os módulos. Cada um será exportado como uma aba separada no <strong>.xlsx</strong>.</p></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Módulos do relatório</span><button type="button" class="btn-text-link" id="btn-select-all">Selecionar todos</button></div>
                     <div class="card-body">
-                        <p class="text-slate-600 mb-6 text-sm">Selecione as informações que deseja incluir no relatório consolidado. Cada módulo selecionado será exportado como uma aba separada na planilha Excel (.xlsx).</p>
-                        
-                        <form id="form-relatorio" class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <!-- Checkbox 1 -->
-                                <label class="flex items-start gap-4 p-5 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-blue-300 cursor-pointer transition-all duration-200 shadow-sm hover:shadow">
-                                    <input type="checkbox" name="modulos" value="colaboradores" class="mt-1 w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
-                                    <div>
-                                        <div class="font-semibold text-slate-800">Colaboradores</div>
-                                        <div class="text-sm text-slate-500 mt-1">Lista completa de funcionários, cargos, setores e status atual.</div>
-                                    </div>
-                                </label>
-                                
-                                <!-- Checkbox 2 -->
-                                <label class="flex items-start gap-4 p-5 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-blue-300 cursor-pointer transition-all duration-200 shadow-sm hover:shadow">
-                                    <input type="checkbox" name="modulos" value="atendimentos" class="mt-1 w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" checked>
-                                    <div>
-                                        <div class="font-semibold text-slate-800">Atendimentos</div>
-                                        <div class="text-sm text-slate-500 mt-1">Histórico de consultas médicas, gravidade e condutas.</div>
-                                    </div>
-                                </label>
-                                
-                                <!-- Checkbox 3 -->
-                                <label class="flex items-start gap-4 p-5 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-blue-300 cursor-pointer transition-all duration-200 shadow-sm hover:shadow">
-                                    <input type="checkbox" name="modulos" value="agendamentos" class="mt-1 w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked>
-                                    <div>
-                                        <div class="font-semibold text-slate-800">Agendamentos</div>
-                                        <div class="text-sm text-slate-500 mt-1">Todos os compromissos marcados no ambulatório.</div>
-                                    </div>
-                                </label>
-                                
-                                <!-- Checkbox 4 -->
-                                <label class="flex items-start gap-4 p-5 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-blue-300 cursor-pointer transition-all duration-200 shadow-sm hover:shadow">
-                                    <input type="checkbox" name="modulos" value="acidentes" class="mt-1 w-5 h-5 rounded border-slate-300 text-amber-600 focus:ring-amber-500" checked>
-                                    <div>
-                                        <div class="font-semibold text-slate-800">Acidentes de Trabalho</div>
-                                        <div class="text-sm text-slate-500 mt-1">Registros de ocorrências, causas, e CATs emitidas.</div>
-                                    </div>
-                                </label>
-                                
-                                <!-- Checkbox 5 -->
-                                <label class="flex items-start gap-4 p-5 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-blue-300 cursor-pointer transition-all duration-200 shadow-sm hover:shadow">
-                                    <input type="checkbox" name="modulos" value="medicamentos" class="mt-1 w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                    <div>
-                                        <div class="font-semibold text-slate-800">Estoque (Medicamentos)</div>
-                                        <div class="text-sm text-slate-500 mt-1">Inventário atual, quantidades mínimas e validades.</div>
-                                    </div>
-                                </label>
-                                
-                                <!-- Checkbox 6 -->
-                                <label class="flex items-start gap-4 p-5 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-blue-300 cursor-pointer transition-all duration-200 shadow-sm hover:shadow">
-                                    <input type="checkbox" name="modulos" value="movimentacoes" class="mt-1 w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                    <div>
-                                        <div class="font-semibold text-slate-800">Movimentações Estoque</div>
-                                        <div class="text-sm text-slate-500 mt-1">Histórico completo de entradas e saídas de materiais.</div>
-                                    </div>
-                                </label>
+                        <form id="form-relatorio">
+                            <div class="rpt-modules-grid">
+                                <label class="rpt-module-card selected"><input type="checkbox" name="modulos" value="colaboradores" checked><div class="rpt-module-icon rpt-icon-blue"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div><div class="rpt-module-info"><div class="rpt-module-name">Colaboradores</div><div class="rpt-module-desc">Funcionários, cargos e status</div></div><div class="rpt-module-check"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div></label>
+                                <label class="rpt-module-card selected"><input type="checkbox" name="modulos" value="atendimentos" checked><div class="rpt-module-icon rpt-icon-emerald"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="rpt-module-info"><div class="rpt-module-name">Atendimentos</div><div class="rpt-module-desc">Consultas, gravidade e condutas</div></div><div class="rpt-module-check"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div></label>
+                                <label class="rpt-module-card selected"><input type="checkbox" name="modulos" value="agendamentos" checked><div class="rpt-module-icon rpt-icon-blue"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div class="rpt-module-info"><div class="rpt-module-name">Agendamentos</div><div class="rpt-module-desc">Exames e compromissos</div></div><div class="rpt-module-check"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div></label>
+                                <label class="rpt-module-card selected"><input type="checkbox" name="modulos" value="acidentes" checked><div class="rpt-module-icon rpt-icon-amber"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div><div class="rpt-module-info"><div class="rpt-module-name">Acidentes de trabalho</div><div class="rpt-module-desc">Ocorrências, causas e CATs</div></div><div class="rpt-module-check"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div></label>
+                                <label class="rpt-module-card"><input type="checkbox" name="modulos" value="medicamentos"><div class="rpt-module-icon rpt-icon-purple"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div><div class="rpt-module-info"><div class="rpt-module-name">Estoque (medicamentos)</div><div class="rpt-module-desc">Inventário, mínimos e validades</div></div><div class="rpt-module-check"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div></label>
+                                <label class="rpt-module-card"><input type="checkbox" name="modulos" value="movimentacoes"><div class="rpt-module-icon rpt-icon-neutral"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div><div class="rpt-module-info"><div class="rpt-module-name">Movimentações de estoque</div><div class="rpt-module-desc">Entradas e saídas de materiais</div></div><div class="rpt-module-check"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div></label>
                             </div>
-                            
-                            <div class="flex items-center justify-between pt-6 border-t border-slate-100">
-                                <button type="button" class="text-sm font-medium text-slate-500 hover:text-slate-700 hover:underline" onclick="document.querySelectorAll('input[name=\'modulos\']').forEach(e => e.checked = true)">Selecionar Todos</button>
-                                
-                                <button type="submit" id="btn-exportar" class="btn btn-primary px-6 py-2.5 flex items-center gap-2 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-200 text-base">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    Gerar Arquivo Excel
-                                </button>
+                            <div class="rpt-actions">
+                                <span class="rpt-selection-count" id="rpt-count">4 módulos selecionados</span>
+                                <button type="submit" id="btn-exportar" class="btn btn-primary"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Exportar Excel</button>
                             </div>
                         </form>
                     </div>
                 </div>
-                
-                <!-- Atalhos rápidos -->
-                <div class="mt-8">
-                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Relatórios Específicos Rápidos</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 transition-colors flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-slate-800">Colaboradores</h4>
-                                <button onclick="downloadRelatorioEspecifico('/api/relatorios/colaboradores/excel', 'colaboradores.xlsx')" class="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1">Baixar .xlsx</button>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 transition-colors flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-slate-800">Atendimentos</h4>
-                                <button onclick="downloadRelatorioEspecifico('/api/relatorios/atendimentos/excel', 'atendimentos.xlsx')" class="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1">Baixar .xlsx</button>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 transition-colors flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-slate-800">Estoque</h4>
-                                <button onclick="downloadRelatorioEspecifico('/api/relatorios/estoque/excel', 'estoque.xlsx')" class="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1">Baixar .xlsx</button>
-                            </div>
-                        </div>
+                <div class="rpt-quick-section">
+                    <h3 class="rpt-quick-title">Downloads rápidos</h3>
+                    <div class="rpt-quick-grid">
+                        <div class="rpt-quick-card"><div class="rpt-quick-icon rpt-icon-blue"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div><div class="rpt-quick-info"><div class="rpt-quick-name">Colaboradores</div><div class="rpt-quick-sub">Lista completa</div></div><button onclick="downloadRelatorioEspecifico('/api/relatorios/colaboradores/excel','colaboradores.xlsx')" class="rpt-quick-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> .xlsx</button></div>
+                        <div class="rpt-quick-card"><div class="rpt-quick-icon rpt-icon-emerald"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="rpt-quick-info"><div class="rpt-quick-name">Atendimentos</div><div class="rpt-quick-sub">Historico completo</div></div><button onclick="downloadRelatorioEspecifico('/api/relatorios/atendimentos/excel','atendimentos.xlsx')" class="rpt-quick-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> .xlsx</button></div>
+                        <div class="rpt-quick-card"><div class="rpt-quick-icon rpt-icon-purple"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div><div class="rpt-quick-info"><div class="rpt-quick-name">Estoque</div><div class="rpt-quick-sub">Inventario atual</div></div><button onclick="downloadRelatorioEspecifico('/api/relatorios/estoque/excel','estoque.xlsx')" class="rpt-quick-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> .xlsx</button></div>
                     </div>
                 </div>
             </div>
@@ -280,7 +192,46 @@
             }
         }
         
+        function updateRptCount() {
+            var checked = document.querySelectorAll('input[name="modulos"]:checked').length;
+            var el = document.getElementById('rpt-count');
+            if (el) el.textContent = checked + ' módulo' + (checked === 1 ? '' : 's') + ' selecionado' + (checked === 1 ? '' : 's');
+            // Sync visual state from checkbox state
+            document.querySelectorAll('.rpt-module-card').forEach(function(card) {
+                var cb = card.querySelector('input[type=checkbox]');
+                if (cb) card.classList.toggle('selected', cb.checked);
+            });
+        }
+
+        // Wire up module card clicks — prevents double-fire from label+input
+        document.querySelectorAll('.rpt-module-card').forEach(function(card) {
+            card.addEventListener('click', function(e) {
+                // If click came from the checkbox itself let it propagate naturally, then sync
+                if (e.target.type === 'checkbox') {
+                    setTimeout(updateRptCount, 0);
+                    return;
+                }
+                e.preventDefault();
+                var cb = card.querySelector('input[type=checkbox]');
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    updateRptCount();
+                }
+            });
+        });
+
+        // "Selecionar todos" button
+        var btnAll = document.getElementById('btn-select-all');
+        if (btnAll) {
+            btnAll.addEventListener('click', function() {
+                document.querySelectorAll('input[name="modulos"]').forEach(function(cb) { cb.checked = true; });
+                updateRptCount();
+            });
+        }
+
         function logout() { localStorage.removeItem('token'); window.location.replace('/login'); }
+
+
         if (!localStorage.getItem('token')) {
             window.location.replace('/login');
         }

@@ -8,15 +8,15 @@ services:
     container_name: saude-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: micro123
+      POSTGRES_DB: ${DB_NAME:-saude_ocupacional}
+      POSTGRES_USER: ${DB_USER:-saude_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no ambiente ou .env}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-saude_user} -d ${DB_NAME:-saude_ocupacional}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -35,29 +35,39 @@ services:
       db:
         condition: service_healthy
     environment:
-      # Banco de dados
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: micro123
-      # Compatibilidade com application.properties (variáveis legadas)
+      # Banco de dados — usar variáveis do host ou .env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-saude_ocupacional}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-saude_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+      # Compat. legada
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: postgres
-      DB_USER: postgres
-      DB_PASSWORD: micro123
+      DB_NAME: ${DB_NAME:-saude_ocupacional}
+      DB_USER: ${DB_USER:-saude_user}
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
       # Servidor
       SERVER_PORT: 8080
-      # JWT
-      JWT_SECRET: saudeOcupacionalSuperSecretKey2024Minimo32Caracteres!
-      JWT_EXPIRATION: 86400000
-      # CORS — permite acesso de qualquer origem da rede local
-      CORS_ORIGINS: "*"
+      # JWT — OBRIGATÓRIO em produção!
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET com pelo menos 64 caracteres}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-28800000}
+      # CORS — restrinja ao IP do servidor
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      # Admin
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Defina ADMIN_PASSWORD para o primeiro acesso}
+      # Perfil Spring
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      # Logs
+      LOGS: /var/log/saude-ocupacional
     ports:
-      - "8081:8080"
+      - "${SERVER_PORT:-8080}:8080"
+    volumes:
+      - app_logs:/var/log/saude-ocupacional
 
 # ──────────────────────────────────────────
 # VOLUMES PERSISTENTES
 # ──────────────────────────────────────────
 volumes:
   postgres_data:
+    driver: local
+  app_logs:
     driver: local

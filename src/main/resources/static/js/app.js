@@ -480,12 +480,26 @@ function hideModal(id) {
 }
 
 function showMessage(msg, type = 'success') {
+    // Remove existing toasts
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+    
+    const icons = {
+        success: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        danger: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        warning: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+        info: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+    };
+    
     const div = document.createElement('div');
-    div.className = `alert alert-${type}`;
-    div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;animation:slideIn 0.3s ease-out';
-    div.textContent = msg;
+    div.className = `toast toast-${type}`;
+    div.innerHTML = `${icons[type] || icons.info}<span>${msg}</span>`;
     document.body.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
+    setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transform = 'translateX(100%)';
+        div.style.transition = 'all 0.3s ease';
+        setTimeout(() => div.remove(), 300);
+    }, 3500);
 }
 
 function formatDate(date) {
@@ -497,11 +511,7 @@ function formatDateTime(date) {
 }
 
 function showAlert(message, type = 'success') {
-    const el = document.createElement('div');
-    el.className = `alert alert-${type}`;
-    el.textContent = message;
-    document.body.insertBefore(el, document.body.firstChild);
-    setTimeout(() => el.remove(), 3000);
+    showMessage(message, type);
 }
 
 // ─── Guard de Autenticação ────────────────────────────────────────────────────
@@ -537,6 +547,67 @@ function checkAuth() {
                 var btn = document.getElementById('btn-usuarios');
                 if (btn) btn.style.display = '';
             }
+            // Preenche o display do usuário no header
+            populateUserDisplay(payload);
         }
     } catch (e) { /* token inválido */ }
-})();
+})();
+
+function populateUserDisplay(payload) {
+    var username = payload.sub || payload.username || 'Usuário';
+    var role = payload.role || payload.perfil || '';
+
+    // Labels legíveis por perfil
+    var roleLabels = {
+        'ADMINISTRADOR':  { label: 'Administrador',  color: '#7c3aed', bg: 'rgba(124,58,237,0.12)' },
+        'ENFERMEIRO':     { label: 'Enfermeiro(a)',   color: '#0369a1', bg: 'rgba(3,105,161,0.12)'  },
+        'MEDICO':         { label: 'Médico(a)',       color: '#065f46', bg: 'rgba(6,95,70,0.12)'    },
+        'TECNICO':        { label: 'Técnico(a)',      color: '#92400e', bg: 'rgba(146,64,14,0.12)'  },
+        'SEGURANCA':      { label: 'Seg. do Trabalho',color: '#1e40af', bg: 'rgba(30,64,175,0.12)'  },
+        'RECEPCAO':       { label: 'Recepção',        color: '#065f46', bg: 'rgba(6,95,70,0.12)'    },
+    };
+    var roleInfo = roleLabels[role] || { label: role || 'Usuário', color: '#445068', bg: 'rgba(68,80,104,0.12)' };
+
+    // Iniciais: primeira letra do primeiro nome + primeira letra do último nome
+    // Ex: Guilherme Azevedo → GA | guilherme_azevedo → GA | admin → AD
+    var parts = username.replace(/_/g, ' ').trim().split(/\s+/);
+    var initials = parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : (username[0] + username[username.length - 1]).toUpperCase();
+
+    // Nome formatado (capitaliza cada palavra)
+    var displayName = parts.map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+
+    // Preenche os elementos (presente em layout e dashboard)
+    var nameEl   = document.getElementById('header-user-name');
+    var roleEl   = document.getElementById('header-user-role');
+    var avatarEl = document.getElementById('header-user-avatar');
+
+    if (nameEl) {
+        nameEl.textContent = displayName;
+        nameEl.title = username;
+    }
+
+    if (roleEl) {
+        roleEl.textContent = roleInfo.label;
+        roleEl.style.cssText = [
+            'display:inline-flex',
+            'align-items:center',
+            'font-size:0.65rem',
+            'font-weight:600',
+            'letter-spacing:0.04em',
+            'text-transform:uppercase',
+            'padding:2px 8px',
+            'border-radius:999px',
+            'color:' + roleInfo.color,
+            'background:' + roleInfo.bg,
+            'margin-top:2px',
+            'white-space:nowrap'
+        ].join(';');
+    }
+
+    if (avatarEl) {
+        avatarEl.textContent = initials;
+        avatarEl.style.background = 'linear-gradient(135deg, ' + roleInfo.color + ', ' + (role === 'ADMINISTRADOR' ? '#10b981' : '#3b82f6') + ')';
+    }
+}

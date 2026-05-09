@@ -81,7 +81,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/index.html",
                     "/css/**", "/js/**", "/static/**",
-                    "/favicon.ico"
+                    "/favicon.ico", "/favicon.svg"
                 ).permitAll()
 
                 // ── Health check (público)

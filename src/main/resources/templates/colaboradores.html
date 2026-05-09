@@ -6,23 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Colaboradores - Saúde Ocupacional</title>
     <link rel="stylesheet" th:href="@{/css/design-system.css}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
         * {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
@@ -140,12 +128,18 @@
                     </div>
                 </div>
                 <div class="app-header-right">
-                    <button onclick="logout()" class="header-icon-btn" title="Sair">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div id="header-user-name" class="user-name">Carregando...</div>
+                            <div id="header-user-role" class="user-role-badge"></div>
+                        </div>
+                        <div id="header-user-avatar" class="user-avatar"></div>
+                        <button onclick="logout()" class="header-icon-btn" title="Sair">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -382,9 +376,14 @@
                 hideModal('modal-colaborador');
                 document.getElementById('form-colaborador').reset();
                 document.getElementById('colab-id').value = '';
+                showMessage(id ? 'Colaborador atualizado com sucesso!' : 'Colaborador cadastrado com sucesso!');
                 loadColaboradores();
             } catch (err) {
                 console.error('Erro ao salvar:', err);
+                showMessage('Erro ao salvar colaborador.', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Salvar';
             }
         });
 

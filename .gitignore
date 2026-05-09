@@ -4,3 +4,12 @@ target/
 .vscode/
 *.log
 postgres_data/
+
+# Arquivos sensíveis — nunca versionar
+.env
+*.env.local
+*.env.prod
+
+# Logs da aplicação
+logs/
+archived/

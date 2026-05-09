@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${status} + ' — Saúde Ocupacional'">Erro — Saúde Ocupacional</title>
+    <link rel="stylesheet" th:href="@{/css/design-system.css}">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg, #0f172a);
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--color-text, #e2e8f0);
+        }
+
+        .error-card {
+            text-align: center;
+            padding: 3rem 2.5rem;
+            max-width: 480px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1.25rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+
+        .error-code {
+            font-size: 6rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .error-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-message {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.75rem;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.625rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .btn-home:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <!-- Ícone dinâmico por código de status -->
+        <div class="icon">
+            <span th:if="${status == 404}">🔍</span>
+            <span th:if="${status == 403}">🔒</span>
+            <span th:if="${status == 500}">⚠️</span>
+            <span th:if="${status != 404 and status != 403 and status != 500}">❌</span>
+        </div>
+
+        <div class="error-code" th:text="${status}">500</div>
+
+        <h1 class="error-title">
+            <span th:if="${status == 404}">Página não encontrada</span>
+            <span th:if="${status == 403}">Acesso negado</span>
+            <span th:if="${status == 500}">Erro interno do servidor</span>
+            <span th:if="${status != 404 and status != 403 and status != 500}" th:text="${error}">Ocorreu um erro</span>
+        </h1>
+
+        <p class="error-message">
+            <span th:if="${status == 404}">A página que você procura não existe ou foi movida.</span>
+            <span th:if="${status == 403}">Você não tem permissão para acessar este recurso.</span>
+            <span th:if="${status == 500}">Ocorreu um erro no servidor. Nossa equipe foi notificada.</span>
+            <span th:if="${status != 404 and status != 403 and status != 500}">Tente novamente em alguns instantes.</span>
+        </p>
+
+        <a href="/dashboard" class="btn-home">
+            ← Voltar ao Dashboard
+        </a>
+    </div>
+</body>
+</html>

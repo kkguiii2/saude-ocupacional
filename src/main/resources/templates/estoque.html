@@ -1,24 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estoque - Saúde Ocupacional</title>
     <link rel="stylesheet" th:href="@{/css/design-system.css}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        * { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Outfit', sans-serif; }
         body { opacity: 0; animation: pageFade 0.3s ease-out forwards; }
         @keyframes pageFade { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -48,6 +37,7 @@
                     <a href="/agendamentos" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="whitespace-nowrap">Agendamentos</span></a>
                     <a href="/estoque" class="sidebar-nav-link active"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><span class="whitespace-nowrap">Estoque</span></a>
                     <a href="/relatorios" class="sidebar-nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span class="whitespace-nowrap">Relatórios</span></a>
+                    <a id="btn-usuarios" href="/usuarios" class="sidebar-nav-link" style="display:none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span class="whitespace-nowrap">Usuários</span></a>
 
                 </div>
             </nav>
@@ -62,7 +52,18 @@
                     <div><h1 class="text-lg font-semibold text-slate-800">Estoque</h1><p class="text-sm text-slate-500">Controle de medicamentos e materiais</p></div>
                 </div>
                 <div class="app-header-right">
-                    <button onclick="logout()" class="header-icon-btn" title="Sair"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div id="header-user-name" class="user-name">Carregando...</div>
+                            <div id="header-user-role" class="user-role-badge"></div>
+                        </div>
+                        <div id="header-user-avatar" class="user-avatar"></div>
+                        <button onclick="logout()" class="header-icon-btn" title="Sair">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </header>
             
@@ -155,12 +156,12 @@
         
         async function entrada(id) {
             const qtd = prompt('Quantidade de entrada:');
-            if (qtd && qtd > 0) { await Estoque.entrada(id, parseInt(qtd)); loadEstoque(); }
+            if (qtd && qtd > 0) { await Estoque.entrada(id, parseInt(qtd)); showMessage('Entrada registrada com sucesso!'); loadEstoque(); }
         }
         
         async function saida(id) {
             const qtd = prompt('Quantidade de saída:');
-            if (qtd && qtd > 0) { await Estoque.saida(id, parseInt(qtd)); loadEstoque(); }
+            if (qtd && qtd > 0) { await Estoque.saida(id, parseInt(qtd)); showMessage('Saída registrada com sucesso!'); loadEstoque(); }
         }
         
         document.getElementById('form-estoque').addEventListener('submit', async (e) => {
@@ -177,8 +178,12 @@
                 await Estoque.save(data);
                 hideModal('modal-estoque');
                 document.getElementById('form-estoque').reset();
+                showMessage('Item adicionado ao estoque com sucesso!');
                 loadEstoque();
-            } catch (err) { console.error('Erro ao salvar:', err); }
+            } catch (err) {
+                console.error('Erro ao salvar:', err);
+                showMessage('Erro ao salvar item no estoque.', 'danger');
+            }
         });
         
         function logout() { localStorage.removeItem('token'); window.location.replace('/login'); }
