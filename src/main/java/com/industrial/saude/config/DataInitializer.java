@@ -4,17 +4,15 @@ import com.industrial.saude.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Inicializa dados padrão para ambiente de desenvolvimento.
- * NÃO executa em produção (perfil "prod").
- * Em prod, crie o admin manualmente ou via script SQL inicial.
+ * Inicializa dados padrão ao subir a aplicação em qualquer ambiente.
+ * A criação do admin é idempotente: só ocorre se o usuário ainda não existir no banco.
+ * Em produção, a senha é lida da variável de ambiente ADMIN_PASSWORD.
  */
 @Slf4j
 @Component
-@Profile("!prod")
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
