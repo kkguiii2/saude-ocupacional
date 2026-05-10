@@ -54,16 +54,17 @@ public class AcidenteController {
     
     @PostMapping("/{id}/cat")
     public ResponseEntity<byte[]> emitirCat(@PathVariable Long id) {
-        byte[] pdf = service.emitirCat(id);
-        if (pdf == null) {
+        byte[] excel = service.emitirCat(id);
+        if (excel == null) {
             return ResponseEntity.notFound().build();
         }
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("filename", "CAT-" + id + ".pdf");
-        
+        headers.setContentType(org.springframework.http.MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDispositionFormData("attachment", "CAT-" + id + ".xlsx");
+
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(pdf);
+                .body(excel);
     }
 }

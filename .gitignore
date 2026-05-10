@@ -9,6 +9,7 @@ postgres_data/
 .env
 *.env.local
 *.env.prod
+.env.example
 
 # Logs da aplicação
 logs/

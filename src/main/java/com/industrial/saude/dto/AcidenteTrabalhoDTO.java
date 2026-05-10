@@ -1,7 +1,6 @@
 package com.industrial.saude.dto;
 
 import com.industrial.saude.model.AcidenteTrabalho;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

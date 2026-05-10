@@ -100,10 +100,10 @@ public class ColaboradorService {
         entity.setEpisObrigatorios(dto.getEpisObrigatorios());
         entity.setContatoEmergencia(dto.getContatoEmergencia());
         entity.setNomeContatoEmergencia(dto.getNomeContatoEmergencia());
-        entity.setTelefoneContato(dto.getTelefoneContato());
+        entity.setTelefoneContato(formatarTelefone(dto.getTelefoneContato()));
         entity.setDataAdmissao(dto.getDataAdmissao());
         entity.setDataNascimento(dto.getDataNascimento());
-        entity.setTelefone(dto.getTelefone());
+        entity.setTelefone(formatarTelefone(dto.getTelefone()));
         entity.setPisPasep(dto.getPisPasep());
         entity.setStatusFuncionario(dto.getStatusFuncionario());
 
@@ -173,12 +173,23 @@ public class ColaboradorService {
         entity.setEpisObrigatorios(dto.getEpisObrigatorios());
         entity.setContatoEmergencia(dto.getContatoEmergencia());
         entity.setNomeContatoEmergencia(dto.getNomeContatoEmergencia());
-        entity.setTelefoneContato(dto.getTelefoneContato());
+        entity.setTelefoneContato(formatarTelefone(dto.getTelefoneContato()));
         entity.setDataAdmissao(dto.getDataAdmissao());
         entity.setDataNascimento(dto.getDataNascimento());
-        entity.setTelefone(dto.getTelefone());
+        entity.setTelefone(formatarTelefone(dto.getTelefone()));
         entity.setPisPasep(dto.getPisPasep());
         entity.setStatusFuncionario(dto.getStatusFuncionario() != null ? dto.getStatusFuncionario() : Colaborador.StatusFuncionario.ATIVO);
         return entity;
+    }
+
+    private String formatarTelefone(String telefone) {
+        if (telefone == null || telefone.trim().isEmpty()) return telefone;
+        String digits = telefone.replaceAll("\\D", "");
+        if (digits.length() == 11) {
+            return String.format("(%s) %s-%s", digits.substring(0, 2), digits.substring(2, 7), digits.substring(7));
+        } else if (digits.length() == 10) {
+            return String.format("(%s) %s-%s", digits.substring(0, 2), digits.substring(2, 6), digits.substring(6));
+        }
+        return telefone;
     }
 }

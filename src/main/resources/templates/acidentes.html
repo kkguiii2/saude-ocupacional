@@ -188,7 +188,7 @@
             });
         }
         
-        async function emitirCat(id) { await Acidentes.emitirCat(id); showMessage('CAT emitida com sucesso! PDF gerado.'); loadAcidentes(); loadCats(); }
+        async function emitirCat(id) { await Acidentes.emitirCat(id); showMessage('CAT emitida com sucesso! Excel (.xlsx) gerado.'); loadAcidentes(); loadCats(); }
         
         document.getElementById('form-acidente').addEventListener('submit', async (e) => {
             e.preventDefault();
