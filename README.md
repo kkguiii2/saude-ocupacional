@@ -117,7 +117,7 @@ Embora o sistema possua telas renderizadas (Thymeleaf), a lógica é exposta de 
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/kkguiii2/saude-ocupacional.git
+   git clone https://github.com/kkguiii2/saude-ocupacional
    cd saude-ocupacional
    ```
 
