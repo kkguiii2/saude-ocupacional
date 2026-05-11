@@ -117,7 +117,7 @@ Embora o sistema possua telas renderizadas (Thymeleaf), a lógica é exposta de 
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/sua-organizacao/saude-ocupacional.git
+   git clone https://github.com/kkguiii2/saude-ocupacional.git
    cd saude-ocupacional
    ```
 
@@ -166,19 +166,6 @@ Levamos a privacidade médica a sério. Práticas de segurança implementadas:
 - [ ] **Cobertura E2E:** Adicionar suite de testes com Cypress ou Playwright para as telas do Thymeleaf.
 - [ ] **Autenticação Multi-Fator (MFA):** Adicionar camada extra de segurança para médicos e enfermeiros.
 - [ ] **Dashboard Analítico Avançado:** Inclusão de gráficos interativos com Chart.js diretamente renderizados pela API.
-
----
-
-## 🤝 Contribuição
-
-Siga os passos abaixo se deseja contribuir:
-
-1. Faça o *fork* do projeto.
-2. Crie uma branch com a sua feature: `git checkout -b feature/minha-feature`.
-3. Garanta que seu código passa no linter e padrões: execute `mvn clean install` e corrija os alertas.
-4. Faça o *commit* das suas alterações: `git commit -m 'feat: Adiciona nova funcionalidade X'`.
-5. Faça o *push* para a branch: `git push origin feature/minha-feature`.
-6. Abra um *Pull Request* detalhado, explicando as mudanças realizadas e problemas resolvidos.
 
 ---
 
