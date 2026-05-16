@@ -112,7 +112,7 @@
             </div>
             <div class="modal-body">
                 <form id="form-acidente" class="space-y-4">
-                    <div class="form-group"><label class="form-label">Matrícula do Colaborador</label><input type="text" id="acid-colab-matricula" required class="form-input" placeholder="Digite a matrícula"></div>
+                    <div class="form-group"><label class="form-label">Matrícula do Colaborador</label><input type="text" id="acid-colab-matricula" required class="form-input" placeholder="Digite a matrícula"><small id="acid-matricula-feedback" class="text-xs mt-1 block font-medium"></small></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="form-group"><label class="form-label">Data/Hora</label><input type="datetime-local" id="acid-data" required class="form-input"></div>
                         <div class="form-group"><label class="form-label">Local na Fábrica</label><input type="text" id="acid-localFabrica" required class="form-input"></div>
@@ -190,8 +190,14 @@
         
         async function emitirCat(id) { await Acidentes.emitirCat(id); showMessage('CAT emitida com sucesso! Excel (.xlsx) gerado.'); loadAcidentes(); loadCats(); }
         
+        setupMatriculaValidation('acid-colab-matricula', 'acid-matricula-feedback');
+        
         document.getElementById('form-acidente').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (document.getElementById('acid-colab-matricula').dataset.matriculaValida !== 'true') {
+                showMessage('Matrícula inválida. Verifique antes de continuar.', 'danger');
+                return;
+            }
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = 'Registrando...';

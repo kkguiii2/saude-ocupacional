@@ -125,6 +125,7 @@
                         <div class="form-group">
                             <label class="form-label">Matrícula do Colaborador</label>
                             <input type="text" id="atend-colab-matricula" required class="form-input" placeholder="Digite a matrícula">
+                            <small id="atend-matricula-feedback" class="text-xs mt-1 block font-medium"></small>
                         </div>
                     </div>
                     <div class="form-group">
@@ -311,8 +312,14 @@
             }
         }
         
+        setupMatriculaValidation('atend-colab-matricula', 'atend-matricula-feedback');
+        
         document.getElementById('form-atendimento').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (document.getElementById('atend-colab-matricula').dataset.matriculaValida !== 'true') {
+                showMessage('Matrícula inválida. Verifique antes de continuar.', 'danger');
+                return;
+            }
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = 'Registrando...';

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -98,7 +98,7 @@
             </div>
             <div class="modal-body">
                 <form id="form-agendamento" class="space-y-4">
-                    <div class="form-group"><label class="form-label">Matrícula do Colaborador</label><input type="text" id="age-colab-matricula" required class="form-input" placeholder="Digite a matrícula"></div>
+                    <div class="form-group"><label class="form-label">Matrícula do Colaborador</label><input type="text" id="age-colab-matricula" required class="form-input" placeholder="Digite a matrícula"><small id="age-matricula-feedback" class="text-xs mt-1 block font-medium"></small></div>
                     <div class="form-group"><label class="form-label">Data/Hora</label><input type="datetime-local" id="age-data" required class="form-input"></div>
                     <div class="form-group">
                         <label class="form-label">Tipo de Exame</label>
@@ -153,8 +153,14 @@
         async function realizar(id) { await Agendamentos.realizar(id); showMessage('Agendamento realizado com sucesso!'); loadAgendamentos(); }
         async function cancelar(id) { if(confirm('Deseja cancelar este agendamento?')) { await Agendamentos.cancelar(id); showMessage('Agendamento cancelado.', 'warning'); loadAgendamentos(); } }
         
+        setupMatriculaValidation('age-colab-matricula', 'age-matricula-feedback');
+        
         document.getElementById('form-agendamento').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (document.getElementById('age-colab-matricula').dataset.matriculaValida !== 'true') {
+                showMessage('Matrícula inválida. Verifique antes de continuar.', 'danger');
+                return;
+            }
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = 'Registrando...';

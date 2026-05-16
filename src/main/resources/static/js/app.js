@@ -610,4 +610,53 @@ function populateUserDisplay(payload) {
         avatarEl.textContent = initials;
         avatarEl.style.background = 'linear-gradient(135deg, ' + roleInfo.color + ', ' + (role === 'ADMINISTRADOR' ? '#10b981' : '#3b82f6') + ')';
     }
+}
+
+// ─── Utilitários de Validação ────────────────────────────────────────────────
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+function setupMatriculaValidation(inputId, feedbackId) {
+    const input = document.getElementById(inputId);
+    const feedback = document.getElementById(feedbackId);
+    
+    if (!input || !feedback) return;
+    
+    input.dataset.matriculaValida = 'false';
+    
+    input.addEventListener('input', debounce(async (e) => {
+        const matricula = e.target.value.trim();
+        if (!matricula) {
+            feedback.textContent = '';
+            feedback.style.color = '';
+            input.dataset.matriculaValida = 'false';
+            return;
+        }
+        
+        feedback.textContent = 'Buscando...';
+        feedback.style.color = '#64748b'; // slate-500
+        input.dataset.matriculaValida = 'false';
+        
+        try {
+            const result = await Colaboradores.getByMatricula(matricula);
+            if (result && result.nomeCompleto) {
+                feedback.textContent = '✔ ' + result.nomeCompleto;
+                feedback.style.color = '#16a34a'; // verde
+                input.dataset.matriculaValida = 'true';
+            } else {
+                feedback.textContent = 'Matrícula não encontrada';
+                feedback.style.color = '#dc2626'; // vermelho
+                input.dataset.matriculaValida = 'false';
+            }
+        } catch (err) {
+            feedback.textContent = 'Matrícula não encontrada';
+            feedback.style.color = '#dc2626'; // vermelho
+            input.dataset.matriculaValida = 'false';
+        }
+    }, 300));
 }
